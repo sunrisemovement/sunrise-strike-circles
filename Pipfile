@@ -15,6 +15,7 @@ phonenumberslite = "*"
 pillow = "*"
 libsass = "*"
 django-sass-processor = "*"
+django-bulma = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,0 +1,17 @@
+{% extends 'base_template.html' %}
+{% load bulma_tags %}
+
+{% block subtitle %}Set Location{% endblock %}
+
+{% block content %}
+
+<h3 class="title">Set Location</h3>
+<form class="media-content" method="post">
+  {% csrf_token %}
+  {{ form|bulma }}
+  <div class="field">
+    <input type="submit" class="button is-primary" value="Update Location">
+  </div>
+</form>
+
+{% endblock %}

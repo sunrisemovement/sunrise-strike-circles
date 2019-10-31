@@ -1,0 +1,31 @@
+{% extends 'base_template.html' %}
+{% load bulma_tags %}
+{% load static %}
+
+{% block subtitle %}New Pledge{% endblock %}
+
+{% block content %}
+<h3 class="title">{{ verb }} pledge</h3>
+<br><br>
+<div class="media">
+
+  {% if verb == 'Update' %}
+  <div class="media-left">
+    <img class="image is-128x128" src="{{ form.initial.picture.url }}" />
+  </div>
+  {% endif %}
+
+  <form class="media-content" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form|bulma }}
+    {{ address_form|bulma }}
+    <div class="field">
+      <input type="submit" class="button is-primary" value="Pledge">
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_javascript %}
+<script type="text/javascript" src="{% static 'pledgetovote/main.js' %}"></script>
+{% endblock %}

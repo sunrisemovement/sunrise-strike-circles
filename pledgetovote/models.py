@@ -10,17 +10,25 @@ class Address(models.Model):
     state = USStateField(max_length=2)
     zipcode = USZipCodeField(max_length=5)
 
+    class Meta:
+        verbose_name_plural = 'Addresses'
+
     def __str__(self):
-        return f"{address}, {city} {state}, {zipcode}"
+        return f"{self.address}, {self.city} {self.state}, {self.zipcode}"
 
 
-class Pledger(models.Model):
+class Location(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+
+class Pledge(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     phone = PhoneNumberField()
     email = models.CharField(max_length=100, validators=[EmailValidator], unique=True)
     address = models.ForeignKey(Address, on_delete=models.PROTECT)
     picture = models.ImageField(upload_to='uploads/%Y/%m/%d/')
+    location = models.ForeignKey(Location, on_delete=models.PROTECT)
 
     def __str__(self):
-        return f"{first_name} {last_name} ({email})"
+        return f"{self.first_name} {self.last_name} ({self.email})"

@@ -1,3 +1,5 @@
 from django.contrib import admin
+from pledgetovote.models import Address, Pledge
 
-# Register your models here.
+admin.site.register(Address)
+admin.site.register(Pledge)

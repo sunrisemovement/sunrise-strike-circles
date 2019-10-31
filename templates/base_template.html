@@ -1,27 +1,19 @@
-{% load static %}
+{% extends 'bulma/base.html' %}
+{% load bulma_tags %}
 
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>templateproject | {% block title %}{% endblock %}</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
-        {% block base_scripts %}
-        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-        {% endblock %}
-    </head>
-    <body>
-        <section class="section">
-            <div class="container">
-                {% block content %}{% endblock %}
-                <h1 class="title">
-                    Hello World
-                </h1>
-                <p class="subtitle">
-                    My first website with <strong>Bulma</strong>!
-                </p>
-            </div>
-        </section>
-    </body>
-</html>
+{% block title %}Pledge to Vote | {% block subtitle %}{% endblock %}{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block javascript %}
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+
+  {% block extra_javascript %}{% endblock %}
+{% endblock %}
+
+{% block footer %}{% endblock %}
