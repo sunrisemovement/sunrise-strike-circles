@@ -3,21 +3,21 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic.edit import CreateView, FormView, UpdateView
 
-from pledgetovote.forms import AddressForm, LocationForm, PledgeForm
+from pledgetovote.forms import AddressForm, LocationForm
 from pledgetovote.models import Address, Location, Pledge
 
 
 """Renders a form that can be used to either create or update a Pledge."""
 class CreateUpdateFormMixin(FormView):
     model = Pledge
-    form_class = PledgeForm
-    exclude = ['address']
-    verb = 'Update'
+    fields = ['first_name', 'last_name', 'phone', 'email', 'picture']
 
     def post(self, request, *args, **kwargs):
         self.object = None
         pledge_form = self.get_form()
         address_form = AddressForm(request.POST)
+
+        print(request.FILES)
 
         if address_form.is_valid() and pledge_form.is_valid():
             address = address_form.save(commit=False)
@@ -43,7 +43,6 @@ class CreateUpdateFormMixin(FormView):
             address_form = AddressForm(instance=address)
 
         context.update(address_form=address_form)
-
         return context
 
     def get_success_url(self):
@@ -58,6 +57,11 @@ class CreatePledge(CreateUpdateFormMixin, CreateView):
 """The view where existing Pledges can be updated."""
 class UpdatePledge(CreateUpdateFormMixin, UpdateView):
     verb = 'Update'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'instance': self.get_object()})
+        return kwargs
 
 
 """

@@ -1,8 +1,13 @@
 {% extends 'base_template.html' %}
 {% load bulma_tags %}
 {% load static %}
+{% load sass_tags %}
 
 {% block subtitle %}New Pledge{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/main.scss' %}">
+{% endblock %}
 
 {% block content %}
 <h3 class="title">{{ verb }} pledge</h3>
@@ -10,17 +15,24 @@
 <div class="media">
 
   {% if verb == 'Update' %}
-  <div class="media-left">
+  <div class="media-left" id="pledge-img">
     <img class="image is-128x128" src="{{ form.initial.picture.url }}" />
+    <div class="box" id="click-to-upload">Upload new image</div>
   </div>
   {% endif %}
 
   <form class="media-content" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form|bulma }}
+    {% for field in form %}
+      {% if verb != 'Update' or not field|is_file %}
+        {{ field|bulma }}
+      {% else %}
+        <span id="hide-img-upload">{{ field|bulma }}</span>
+      {% endif %}
+    {% endfor %}
     {{ address_form|bulma }}
     <div class="field">
-      <input type="submit" class="button is-primary" value="Pledge">
+      <input type="submit" class="button is-primary" value="{{ verb }}">
     </div>
   </form>
 </div>

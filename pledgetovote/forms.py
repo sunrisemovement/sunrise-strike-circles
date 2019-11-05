@@ -23,8 +23,3 @@ class LocationForm(forms.Form):
             'placeholder': "Enter a location name here to create a new location"
         })
     )
-
-class PledgeForm(forms.ModelForm):
-    class Meta:
-        model = Pledge
-        exclude = ['address', 'location']
