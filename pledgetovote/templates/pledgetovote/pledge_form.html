@@ -1,4 +1,4 @@
-{% extends 'base_template.html' %}
+{% extends 'pledgetovote/base_template.html' %}
 {% load bulma_tags %}
 {% load static %}
 {% load sass_tags %}
@@ -6,7 +6,7 @@
 {% block subtitle %}New Pledge{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/main.scss' %}">
+<link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/pledge_form.sass' %}">
 {% endblock %}
 
 {% block content %}
@@ -39,5 +39,5 @@
 {% endblock %}
 
 {% block extra_javascript %}
-<script type="text/javascript" src="{% static 'pledgetovote/main.js' %}"></script>
+<script type="text/javascript" src="{% static 'pledgetovote/js/pledge_form.js' %}"></script>
 {% endblock %}

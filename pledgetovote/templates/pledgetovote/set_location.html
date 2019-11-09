@@ -1,4 +1,5 @@
-{% extends 'base_template.html' %}
+{% extends 'pledgetovote/base_template.html' %}
+{% load static %}
 {% load bulma_tags %}
 
 {% block subtitle %}Set Location{% endblock %}
@@ -14,4 +15,8 @@
   </div>
 </form>
 
+{% endblock %}
+
+{% block extra_javascript %}
+<script type="text/javascript" src="{% static 'pledgetovote/js/set_location.js' %}"></script>
 {% endblock %}

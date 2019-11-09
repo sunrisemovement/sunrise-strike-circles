@@ -1,8 +1,14 @@
 {% extends 'bulma/base.html' %}
 {% load static %}
+{% load sass_tags %}
 {% load bulma_tags %}
 
 {% block title %}Pledge to Vote | {% block subtitle %}{% endblock %}{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/base_template.sass' %}">
+{% block extra_css %}{% endblock %}
+{% endblock %}
 
 {% block header %}
 <div class="container">
@@ -12,14 +18,14 @@
           <img src="{% static 'pledgetovote/sunrise_logo.png' %}" alt="Sunrise Movement: Pledge to Vote">
         </a>
 
-        <div class="navbar-burger burger" data-target="pledge-menu">
-          <span></span>
-          <span></span>
-          <span></span>
+        <div role="button" class="navbar-burger burger" aria-expanded="false" data-target="pledgeMenu">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
         </div>
       </div>
 
-      <div id="pledge-menu" class="navbar-menu">
+      <div id="pledgeMenu" class="navbar-menu">
         <div class="navbar-start">
           <a class="navbar-item" href="{% url 'pledgetovote:pledge_new' %}">
             New Pledge
@@ -33,14 +39,12 @@
   </div>
 {% endblock %}
 
-{% block content %}{% endblock %}
-
 {% block javascript %}
-<script
-  src="https://code.jquery.com/jquery-3.4.1.min.js"
-  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-  crossorigin="anonymous"></script>
-
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"></script>
+    <script src="{% static 'pledgetovote/js/base_template.js' %}"></script>
   {% block extra_javascript %}{% endblock %}
 {% endblock %}
 
