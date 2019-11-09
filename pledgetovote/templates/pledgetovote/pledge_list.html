@@ -11,36 +11,42 @@
 {% block content %}
 
 <div class="title">Pledges</div>
-<section class="section" id="pledge-list-header">
+<section class="section is-hidden-touch" id="pledge-list-header">
   <div class="columns is-centered">
-    <div class="column is-offset-1 is-2"><div class="subtitle is-4">Name</div></div>
-    <div class="column is-2"><div class="subtitle is-4">Email</div></div>
+    <div class="column is-offset-4-desktop is-offset-1-widescreen is-offset-1-fullhd is-one-fifth-tablet is-2-desktop is-2-widescreen is-1-fullhd">
+      <div class="subtitle is-4">Name</div>
+    </div>
+    <div class="column is-3"><div class="subtitle is-4">Email</div></div>
     <div class="column is-2"><div class="subtitle is-4">Phone</div></div>
     <div class="column is-2"><div class="subtitle is-4">Signup Location</div></div>
-    <div class="column is-3"><div class="subtitle is-4">Address</div></div>
+    <div class="column is-3"><div class="subtitle is-hidden-desktop-only is-4">Address</div></div>
   </div>
   <hr class="hr">
 </section>
 
 <section class="section" id="pledge-list">
 {% for pledge in pledge_list %}
-  <div class="columns is-vcentered" data-link="{% url 'pledgetovote:pledge_edit' pledge.id %}">
-      <div class="column is-1">
+  <div class="columns is-vcentered is-mobile" data-link="{% url 'pledgetovote:pledge_edit' pledge.id %}">
+      <div class="column is-hidden-mobile is-one-fifth-tablet is-2-desktop is-2-widescreen is-1-fullhd">
         <a href="{% url 'pledgetovote:pledge_edit' pledge.id %}">
-          <figure class="image">
-            <img src="{{ pledge.picture.url }}" alt="{{ pledge.first_name }} {{ pledge.last_name }}'s picture">
-          </figure>
+          <figure class="image" style="background-image: url({{ pledge.picture.url }});"></figure>
         </a>
       </div>
-    <div class="column is-2">
+    <div class="column is-one-quarter-mobile is-one-fifth-tablet is-2-desktop is-1-widescreen is-1-fullhd">
       <a href="{% url 'pledgetovote:pledge_edit' pledge.id %}">
         {{ pledge.first_name }} {{ pledge.last_name }}
       </a>
     </div>
-    <div class="column is-2">{{ pledge.email }}</div>
-    <div class="column is-2">{{ pledge.phone }}</div>
-    <div class="column is-2">{{ pledge.location }}</div>
-    <div class="column is-4">{{ pledge.address }}</div>
+    <div class="column is-3 is-hidden-touch">{{ pledge.email }}</div>
+    <div class="column is-2 is-hidden-touch">{{ pledge.phone }}</div>
+    <div class="column is-one-half-mobile is-two-fifths-tablet is-hidden-desktop">
+      <div>{{ pledge.email }}</div>
+      <div>{{ pledge.phone }}</div>
+    </div>
+    <div class="column is-one-quarter-mobile is-one-fifth-tablet is-2-desktop is-2-widescreen is-2-fullhd">
+      {{ pledge.location }}
+    </div>
+    <div class="column is-2-desktop is-3-widescreen is-3-fullhd is-hidden-desktop-only is-hidden-touch">{{ pledge.address }}</div>
   </div>
 {% empty %}
   <div class="columns">
