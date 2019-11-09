@@ -2,9 +2,17 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic.edit import CreateView, FormView, UpdateView
+from django.views.generic.list import ListView
 
 from pledgetovote.forms import AddressForm, LocationForm
 from pledgetovote.models import Address, Location, Pledge
+
+
+"""Displays a list of all Pledges."""
+class PledgeList(ListView):
+    model = Pledge
+    context_object_name = 'pledge_list'
+    paginate_by = 50
 
 
 """Renders a form that can be used to either create or update a Pledge."""
@@ -53,6 +61,15 @@ class CreateUpdateFormMixin(FormView):
 class CreatePledge(CreateUpdateFormMixin, CreateView):
     verb = 'Create'
 
+    def get(self, request, *args, **kwargs):
+        # Anyone who tries to start a new pledge is rerouted to the SetLocation view if their
+        # location_id cookie isn't set.
+        location_cookie = request.session.get('location_id', None)
+        if not location_cookie:
+            return redirect('pledgetovote:set_location')
+
+        return super().get(request, *args, **kwargs)
+
 
 """The view where existing Pledges can be updated."""
 class UpdatePledge(CreateUpdateFormMixin, UpdateView):
@@ -62,17 +79,6 @@ class UpdatePledge(CreateUpdateFormMixin, UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs.update({'instance': self.get_object()})
         return kwargs
-
-
-"""
-Anyone who visits the homepage is rerouted to the SetLocation view if their location_id cookie isn't
-set.
-"""
-def reroute(request):
-    location_cookie = request.session.get('location', None)
-    if location_cookie:
-        return redirect('pledgetovote:pledge_new')
-    return redirect('pledgetovote:set_location')
 
 
 """
@@ -109,10 +115,10 @@ class SetLocation(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        location_id = self.request.session.get('location_id')
 
         # If the user's location_id cookie is set, make that location the default value for the
         # select_location form field
+        location_id = self.request.session.get('location_id')
         if location_id:
             context['form'].initial['select_location'] = location_id
 

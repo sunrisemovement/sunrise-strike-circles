@@ -20,6 +20,9 @@ class Address(models.Model):
 class Location(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Pledge(models.Model):
     first_name = models.CharField(max_length=100)
