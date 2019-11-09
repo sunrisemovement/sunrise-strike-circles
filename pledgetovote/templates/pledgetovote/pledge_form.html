@@ -12,12 +12,29 @@
 {% block content %}
 <h3 class="title">{{ verb }} pledge</h3>
 <br><br>
+
+{% if verb == 'Update' %}
+<section class="section">
+  <div class="columns is-hidden-tablet pledge-img">
+    <div class="column is-half">
+      <figure class="image">
+        <img src="{{ form.initial.picture.url }}" />
+      </figure>
+      <div class="box click-to-upload">Upload new image</div>
+    </div>
+    <br>
+  </div>
+</section>
+{% endif %}
+
 <div class="media">
 
   {% if verb == 'Update' %}
-  <div class="media-left" id="pledge-img">
-    <img class="image is-128x128" src="{{ form.initial.picture.url }}" />
-    <div class="box" id="click-to-upload">Upload new image</div>
+  <div class="media-left is-hidden-mobile pledge-img">
+    <figure class="image is-128x128">
+      <img src="{{ form.initial.picture.url }}" />
+    </figure>
+    <div class="box click-to-upload">Upload new image</div>
   </div>
   {% endif %}
 
@@ -31,10 +48,9 @@
       {% endif %}
     {% endfor %}
     {{ address_form|bulma }}
-    <div class="field">
-      <input type="submit" class="button is-primary" value="{{ verb }}">
-    </div>
-  </form>
+
+    <input type="submit" name="submit" class="button is-primary" value="{{ verb }}">
+    <input type="submit" name="submit-create-next" class="button is-info" value="Finish and create next">
 </div>
 {% endblock %}
 

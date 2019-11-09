@@ -7,7 +7,7 @@ $(document).ready(function() {
   });
 
   // Click hidden image upload form field when current image is clicked
-  $('#pledge-img').click(function() {
+  $('.pledge-img').click(function() {
     $('#hide-img-upload input').click();
   });
 });

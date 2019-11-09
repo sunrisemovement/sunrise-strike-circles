@@ -1,16 +1,35 @@
-#pledge-img
+@import "../../../../static/bulma/sass/style.sass"
+
+.pledge-img
   &:hover
     cursor: pointer
 
-    #click-to-upload
+    .click-to-upload
       opacity: 1
       font-weight: 500
 
-  #click-to-upload
-    opacity: 0.75
-    max-width: 128px
+  &.is-hidden-mobile
+    .image
+      max-height: 128px
+      max-width: 128px
+      height: fit-content
+      width: fit-content
+
+    .click-to-upload
+      opacity: 0.75
+      max-width: 128px
+
+  .click-to-upload
     text-align: center
     padding: 5px
 
 #hide-img-upload
   display: none
+
+.media-content
+  .field label, input[type='submit']
+    @media(max-width: $tablet)
+      font-size: $size-5
+
+  input[type='submit']
+    margin-top: 10px

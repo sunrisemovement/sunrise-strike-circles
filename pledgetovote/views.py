@@ -36,7 +36,6 @@ class CreateUpdateFormMixin(FormView):
             pledge.save()
 
             self.object = pledge
-
             return HttpResponseRedirect(self.get_success_url())
 
         return self.render_to_response(self.get_context_data(form=pledge_form))
@@ -54,6 +53,9 @@ class CreateUpdateFormMixin(FormView):
         return context
 
     def get_success_url(self):
+        # Go to pledgetovote:pledge_new if the user clicked the button to submit and create new
+        if 'submit-create-next' in self.request.POST:
+            return reverse('pledgetovote:pledge_new')
         return reverse('pledgetovote:pledge_edit', kwargs={'pk': self.object.id})
 
 
