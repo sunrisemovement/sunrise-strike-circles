@@ -17,9 +17,7 @@
 <section class="section">
   <div class="columns is-hidden-tablet pledge-img">
     <div class="column is-half">
-      <figure class="image">
-        <img src="{{ form.initial.picture.url }}" />
-      </figure>
+      <figure class="image" style="background-image: url({{ form.initial.picture.url }});"></figure>
       <div class="box click-to-upload">Upload new image</div>
     </div>
     <br>
@@ -31,9 +29,7 @@
 
   {% if verb == 'Update' %}
   <div class="media-left is-hidden-mobile pledge-img">
-    <figure class="image is-128x128">
-      <img src="{{ form.initial.picture.url }}" />
-    </figure>
+    <figure class="image" style="background-image: url({{ form.initial.picture.url }});"></figure>
     <div class="box click-to-upload">Upload new image</div>
   </div>
   {% endif %}
