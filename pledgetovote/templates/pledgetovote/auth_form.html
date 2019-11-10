@@ -1,0 +1,14 @@
+{% extends 'pledgetovote/base_template.html' %}
+{% load bulma_tags %}
+
+{% block subtitle %}Log in{% endblock %}
+
+{% block content %}
+
+<div class="title">Log in</div>
+<form class="level" method="post">
+  {% csrf_token %}
+  {{ form|bulma }}
+  <input type="submit" class="button is-primary" name="Log in">
+</form>
+{% endblock %}

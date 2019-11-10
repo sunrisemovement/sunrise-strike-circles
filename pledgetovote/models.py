@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.validators import EmailValidator
 from django.db import models
 from localflavor.us.models import USStateField, USZipCodeField
@@ -22,6 +23,17 @@ class Location(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Passcode(models.Model):
+    passcode = models.CharField(max_length=50)
+    active = models.BooleanField(default=False)
+
+    def __str__(self):
+        if settings.DEBUG:
+            return f'<Passcode (IN DEBUG) passcode={self.passcode} active={self.active}>'
+        else:
+            return f'<Passcode passcode=SECRET active={self.active}>'
 
 
 class Pledge(models.Model):

@@ -1,11 +1,19 @@
 from django import forms
 
-from pledgetovote.models import Address, Location, Pledge
+from pledgetovote.models import Address, Location, Passcode, Pledge
+
 
 class AddressForm(forms.ModelForm):
     class Meta:
         model = Address
         fields = '__all__'
+
+
+class AuthForm(forms.Form):
+    passcode = forms.CharField(
+        max_length=50,
+        widget=forms.PasswordInput
+    )
 
 
 class LocationForm(forms.Form):

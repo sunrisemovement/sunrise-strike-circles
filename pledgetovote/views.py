@@ -4,8 +4,37 @@ from django.urls import reverse
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
 
-from pledgetovote.forms import AddressForm, LocationForm
-from pledgetovote.models import Address, Location, Pledge
+from pledgetovote.forms import AddressForm, LocationForm, AuthForm
+from pledgetovote.models import Address, Location, Passcode, Pledge
+
+
+"""Make users enter a passcode (non user-specific) before they can access the site."""
+class Auth(FormView):
+    form_class = AuthForm
+    template_name = 'pledgetovote/auth_form.html'
+
+    # If already authenticated, redirect to the pledgetovote homepage
+    def get(self, request, *args, **kwargs):
+        if request.session.get('authenticated'):
+            return redirect('pledgetovote:pledge_root')
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        auth_form = self.get_form()
+
+        if auth_form.is_valid():
+            matching_codes = Passcode.objects.filter(active=True,
+                                                     passcode=auth_form.cleaned_data['passcode'])
+
+            if len(matching_codes):
+                request.session['authenticated'] = True
+                request.session.set_expiry(60 * 60 * 24 * 7)  # Auth expires in a week
+                return redirect('pledgetovote:pledge_root')
+            else:
+                auth_form.errors['passcode'] = ['Please enter a valid passcode.']
+
+        return self.render_to_response(self.get_context_data(form=auth_form))
 
 
 """Displays a list of all Pledges."""
@@ -24,8 +53,6 @@ class CreateUpdateFormMixin(FormView):
         self.object = None
         pledge_form = self.get_form()
         address_form = AddressForm(request.POST)
-
-        print(request.FILES)
 
         if address_form.is_valid() and pledge_form.is_valid():
             address = address_form.save(commit=False)
