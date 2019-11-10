@@ -41,6 +41,7 @@ class Auth(FormView):
 class PledgeList(ListView):
     model = Pledge
     context_object_name = 'pledge_list'
+    queryset = Pledge.objects.all().order_by('-id')
     paginate_by = 50
 
 
