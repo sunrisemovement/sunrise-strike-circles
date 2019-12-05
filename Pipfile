@@ -4,9 +4,10 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pylint = "*"
 
 [packages]
-django = "*"
+django = "~=2.2"
 django-environ = "*"
 gunicorn = "*"
 django-localflavor = "*"

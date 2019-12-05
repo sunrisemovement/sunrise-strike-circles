@@ -23,6 +23,7 @@ class Auth(FormView):
     def post(self, request, *args, **kwargs):
         auth_form = self.get_form()
 
+
         if auth_form.is_valid():
             matching_codes = Passcode.objects.filter(active=True,
                                                      passcode=auth_form.cleaned_data['passcode'])
