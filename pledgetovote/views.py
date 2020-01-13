@@ -1,110 +1,59 @@
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
-from django.urls import reverse
-from django.views.generic.edit import CreateView, FormView, UpdateView
+from django.shortcuts import render_to_response
+from django.urls import reverse_lazy
+from django.views.generic.base import TemplateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
-from pledgetovote.forms import AddressForm, LocationForm, AuthForm
-from pledgetovote.models import Address, Location, Passcode, Pledge
+from pledgetovote.forms import SignupForm, StrikeCircleCreateForm
+from pledgetovote.models import Pledge, StrikeCircle
 
 
-"""Make users enter a passcode (non user-specific) before they can access the site."""
-class Auth(FormView):
-    form_class = AuthForm
-    template_name = 'pledgetovote/auth_form.html'
-
-    # If already authenticated, redirect to the pledgetovote homepage
-    def get(self, request, *args, **kwargs):
-        if request.session.get('authenticated'):
-            return redirect('pledgetovote:pledge_root')
-        else:
-            return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        auth_form = self.get_form()
-
-
-        if auth_form.is_valid():
-            matching_codes = Passcode.objects.filter(active=True,
-                                                     passcode=auth_form.cleaned_data['passcode'])
-
-            if len(matching_codes):
-                request.session['authenticated'] = True
-                request.session.set_expiry(60 * 60 * 24 * 7)  # Auth expires in a week
-                return redirect('pledgetovote:pledge_root')
-            else:
-                auth_form.errors['passcode'] = ['Please enter a valid passcode.']
-
-        return self.render_to_response(self.get_context_data(form=auth_form))
-
-
-"""Displays a list of all Pledges."""
-class PledgeList(ListView):
-    model = Pledge
-    context_object_name = 'pledge_list'
-    queryset = Pledge.objects.all().order_by('-id')
-    paginate_by = 50
-
-
-"""Renders a form that can be used to either create or update a Pledge."""
-class CreateUpdateFormMixin(FormView):
-    model = Pledge
-    fields = ['first_name', 'last_name', 'phone', 'email', 'picture']
+class Signup(CreateView):
+    form_class = SignupForm
+    template_name = 'pledgetovote/base_form.html'
+    success_url = reverse_lazy('pledgetovote:dashboard')
 
     def post(self, request, *args, **kwargs):
         self.object = None
-        pledge_form = self.get_form()
-        address_form = AddressForm(request.POST)
+        user_form = self.get_form()
+        sc_form = StrikeCircleCreateForm(request.POST)
 
-        if address_form.is_valid() and pledge_form.is_valid():
-            address = address_form.save(commit=False)
-            address.save()
-            pledge = pledge_form.save(commit=False)
-            pledge.address = address
-            pledge.location = Location.objects.get(id=request.session['location_id'])
-            pledge.save()
+        if user_form.is_valid() and sc_form.is_valid():
+            user = user_form.save(commit=False)
+            user.save()
+            sc = sc_form.save(commit=False)
+            sc.user = user
+            sc.save()
 
-            self.object = pledge
-            return HttpResponseRedirect(self.get_success_url())
+            authenticated_user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
+            if authenticated_user is not None:
+                login(request, authenticated_user)
+                return HttpResponseRedirect(self.get_success_url())
+            else:
+                sc.delete()
+                user.delete()
+                raise ValidationError("Could not log in user after signing up. Please retry user creation.")
 
-        return self.render_to_response(self.get_context_data(form=pledge_form))
+        return self.render_to_response(self.get_context_data(form=user_form))
+
+    def get_context_data(self, **kwargs):
+        kwargs['form_submit_name'] = "Sign up"
+        kwargs['sc_form'] = StrikeCircle()
+        return super().get_context_data(**kwargs)
+
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['verb'] = self.verb
 
-        address_form = AddressForm()
-        if self.object:
-            address = Address.objects.get(id=self.object.address.id)
-            address_form = AddressForm(instance=address)
-
-        context.update(address_form=address_form)
         return context
 
-    def get_success_url(self):
-        # Go to pledgetovote:pledge_new if the user clicked the button to submit and create new
-        if 'submit-create-next' in self.request.POST:
-            return reverse('pledgetovote:pledge_new')
-        return reverse('pledgetovote:pledge_edit', kwargs={'pk': self.object.id})
-
-
-"""The view where new Pledges can be created."""
-class CreatePledge(CreateUpdateFormMixin, CreateView):
-    verb = 'Create'
-
-    def get(self, request, *args, **kwargs):
-        # Anyone who tries to start a new pledge is rerouted to the SetLocation view if their
-        # location_id cookie isn't set.
-        location_cookie = request.session.get('location_id', None)
-        if not location_cookie:
-            return redirect('pledgetovote:set_location')
-
-        return super().get(request, *args, **kwargs)
-
-
-"""The view where existing Pledges can be updated."""
-class UpdatePledge(CreateUpdateFormMixin, UpdateView):
-    verb = 'Update'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -121,36 +70,25 @@ class SetLocation(FormView):
     form_class = LocationForm
     template_name = 'pledgetovote/set_location.html'
 
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        location_form = self.get_form()
 
-        if location_form.is_valid():
-            new_location = location_form.cleaned_data.get('new_location')
-            selected_location_id = location_form.cleaned_data.get('select_location')
 
-            # If the user entered a new location, create it and point their location_id cookie to it
-            if new_location:
-                location = Location(name=new_location)
-                location.save()
-            else:
-                location = Location.objects.get(id=selected_location_id)
 
-            request.session['location_id'] = location.id  # Set the location_id cookie
-            request.session.set_expiry(60 * 60 * 24)  # Expire in 24 hours
-            self.object = location
 
-            return redirect('pledgetovote:pledge_new')
 
-        return self.render_to_response(self.get_context_data(form=location_form))
+"""Displays a list of all Pledges."""
+class PledgeList(LoginRequiredMixin, ListView):
+    model = Pledge
+    context_object_name = 'pledge_list'
+    queryset = Pledge.objects.all().order_by('-id')
+    paginate_by = 50
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+"""The view where new Pledges can be created."""
+class CreatePledge(CreateView):
+    verb = 'Create'
+    model = Pledge
 
-        # If the user's location_id cookie is set, make that location the default value for the
-        # select_location form field
-        location_id = self.request.session.get('location_id')
-        if location_id:
-            context['form'].initial['select_location'] = location_id
 
-        return context
+"""The view where existing Pledges can be updated."""
+class UpdatePledge(UpdateView):
+    verb = 'Update'
+    model = Pledge

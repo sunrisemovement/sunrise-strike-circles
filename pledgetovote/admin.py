@@ -1,7 +1,5 @@
 from django.contrib import admin
-from pledgetovote.models import Address, Location, Passcode, Pledge
+from pledgetovote.models import Pledge, StrikeCircle
 
-admin.site.register(Address)
-admin.site.register(Location)
 admin.site.register(Pledge)
-admin.site.register(Passcode)
+admin.site.register(StrikeCircle)

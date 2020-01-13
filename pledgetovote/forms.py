@@ -1,46 +1,50 @@
 from django import forms
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
-from pledgetovote.models import Address, Location, Passcode, Pledge
+from pledgetovote.models import StrikeCircle
 
 
-class AddressForm(forms.ModelForm):
+class SignupForm(forms.ModelForm):
+    password2 = forms.CharField(label="Confirm password", widget=forms.PasswordInput)
+    name = forms.CharField(label="Strike Circle name", max_length=100)
+
     class Meta:
-        model = Address
-        fields = '__all__'
+        model = User
+        fields = ['username', 'email', 'password']
+        widgets = {
+            'password': forms.PasswordInput,
+            'password2': forms.PasswordInput
+        }
+        labels = {
+            'username': "Strike Circle username"
+        }
 
+    def clean_password2(self):
+        pass1 = self.cleaned_data['password']
+        pass2 = self.cleaned_data['password2']
 
-class AuthForm(forms.Form):
-    passcode = forms.CharField(
-        max_length=50,
-        widget=forms.PasswordInput
-    )
+        if pass1 and pass2 and pass1 != pass2:
+            raise ValidationError("Passwords do not match")
 
+        return pass2
 
-class LocationForm(forms.Form):
-
-    select_location = forms.CharField(required=False)
-    create_new_location = forms.BooleanField(required=False)
-    new_location = forms.CharField(
-        max_length=255,
-        required=False,
-        widget=forms.TextInput(attrs={'placeholder': "Create a new location..."})
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        locations = Location.objects.all()
-        self.location_choices = [(loc.id, loc.name) for loc in locations]
-        self.locs_exist = len(locations) > 0
-
-        # Disable select_location field if no Locations exist
-        self.fields['select_location'].widget = forms.Select(
-            attrs={'disabled': not self.locs_exist},
-            choices=self.location_choices or [('UNSELECTABLE', "No locations exist")]
+    def save(self, **kwargs):
+        data = self.cleaned_data
+        user = User(
+            username = data['username'],
+            email = data['email'],
         )
+        user.set_password(data['password'])
+        user.save()
+        return user
 
-        self.fields['create_new_location'].initial = not self.locs_exist
-        # Disable the create_new_location field if no Locations exist, to force the user to create a Location
-        self.fields['create_new_location'].widget = forms.CheckboxInput(attrs={'disabled': not self.locs_exist})
 
-        # If any locations exist, disable the new_location by default
-        self.fields['new_location'].widget.disabled = self.locs_exist
+class StrikeCircleCreateForm(forms.ModelForm):
+
+    class Meta:
+        model = StrikeCircle
+        fields = ['name']
+        labels = {
+            'name': "Strike Circle name"
+        }

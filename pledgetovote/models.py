@@ -1,49 +1,48 @@
-from django.conf import settings
+from datetime import date, timedelta
+
 from django.core.validators import EmailValidator
+from django.contrib.auth.models import User
 from django.db import models
-from localflavor.us.models import USStateField, USZipCodeField
+from localflavor.us.models import USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-class Address(models.Model):
-    address = models.CharField(max_length=255)
-    city = models.CharField(max_length=100)
-    state = USStateField(max_length=2)
-    zipcode = USZipCodeField(max_length=5)
-
-    class Meta:
-        verbose_name_plural = 'Addresses'
+class StrikeCircle(models.Model):
+    name = models.CharField(max_length=100)
+    pledge_goal = models.IntegerField(default=0)
+    one_on_one_goal = models.IntegerField(default=0)
+    user = models.OneToOneField(User, on_delete=models.PROTECT)
 
     def __str__(self):
-        return f"{self.address}, {self.city} {self.state}, {self.zipcode}"
-
-
-class Location(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class Passcode(models.Model):
-    passcode = models.CharField(max_length=50)
-    active = models.BooleanField(default=False)
-
-    def __str__(self):
-        if settings.DEBUG:
-            return f'<Passcode (IN DEBUG) passcode={self.passcode} active={self.active}>'
-        else:
-            return f'<Passcode passcode=SECRET active={self.active}>'
+        return f"<StrikeCircle {self.name}>"
 
 
 class Pledge(models.Model):
+    YEAR_CHOICES = [(i, i) for i in range(1900, date.today().year)]
+
+    # Strike Circles meet for the first time the week of 2/10/2020, and start canvassing the following week
+    DAYS_PER_WEEK = 7
+    START_WEEK = 2
+    """
+    TODO: Figure out why replacing `date(2020, 2, 10)` with FIRST_SC_MEETING_WEEK in DATA_COLLECTED_DATES results in
+    "NameError: name 'FIRST_SC_MEETING_WEEK' is not defined"
+    """
+    FIRST_SC_MEETING_WEEK = date(2020, 2, 10)
+    NUM_DATA_COLLECTION_WEEKS = 5
+    DATA_COLLECTED_DATES = [(date(2020, 2, 10) + timedelta(weeks=(i - 1)), f'Week {i}')
+                                for i in range(START_WEEK, START_WEEK + NUM_DATA_COLLECTION_WEEKS)]
+
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    phone = PhoneNumberField()
     email = models.CharField(max_length=100, validators=[EmailValidator], unique=True)
-    address = models.ForeignKey(Address, on_delete=models.PROTECT)
-    picture = models.ImageField(upload_to='uploads/%Y/%m/%d/')
-    location = models.ForeignKey(Location, on_delete=models.PROTECT)
+    phone = PhoneNumberField()
+    zipcode = USZipCodeField(max_length=5)
+    yob = models.IntegerField(choices=YEAR_CHOICES)
+    one_on_one = models.BooleanField(default=False)
+    data_collected = models.DateField(choices=DATA_COLLECTED_DATES)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    strike_circle = models.ForeignKey(StrikeCircle, on_delete=models.PROTECT)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.email})"
+        return f"{self.first_name} {self.last_name} ({self.email} :: last modified {self.date_modified})"
