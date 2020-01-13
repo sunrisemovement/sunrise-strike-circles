@@ -1,0 +1,23 @@
+{% extends 'pledgetovote/base_template.html' %}
+{% load sass_tags static %}
+
+{% block subtitle %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/dashboard.sass' %}">
+{% endblock %}
+
+{% block content %}
+<div class="title is-2 dashboard-title">Strike Circle Central</div>
+<div class="title">Pledges to Strike</div>
+{% include 'pledgetovote/thermometer.html' with data=pledge_thermometer %}
+<hr class="hr">
+<div class="title">One on Ones</div>
+{% include 'pledgetovote/thermometer.html' with data=one_on_one_thermometer %}
+{% endblock %}
+
+{% block extra_javascript %}
+<!-- See thermometer.html for details about why this script has to be added here -->
+<script type="text/javascript" src="{% static 'pledgetovote/js/thermometer.js' %}"></script>
+{% endblock %}
+

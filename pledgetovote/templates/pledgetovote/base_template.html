@@ -14,7 +14,7 @@
 <div class="container">
     <nav class="navbar">
       <div class="navbar-brand">
-        <a class="navbar-item" href="/">
+        <a class="navbar-item" href="{% url 'pledgetovote:org_dash' %}">
           <img src="{% static 'pledgetovote/sunrise_logo.png' %}" alt="Sunrise Movement: Pledge to Vote">
         </a>
 
@@ -27,12 +27,9 @@
 
       <div id="pledgeMenu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="{% url 'pledgetovote:pledge_new' %}">
-            New Pledge
-          </a>
-          <a class="navbar-item" href="{% url 'pledgetovote:set_location' %}">
-            Set Location
-          </a>
+          <a class="navbar-item" href="{% url 'pledgetovote:dashboard' %}">Dashboard</a>
+          <a class="navbar-item" href="{% url 'pledgetovote:sc_edit' %}">Settings</a>
+          <a class="navbar-item" href="{% url 'logout' %}">Log out</a>
         </div>
       </div>
     </nav>

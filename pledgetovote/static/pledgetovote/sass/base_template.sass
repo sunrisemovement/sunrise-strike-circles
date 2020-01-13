@@ -1,4 +1,20 @@
 @import "../../../../static/bulma/sass/style.sass"
 
+body
+  background-color: $dark
+
 .navbar
-  border-bottom: 2px solid $grey-lighter
+  .navbar-menu, .navbar-brand
+    background-color: $dark
+    color: $yellow
+
+  .navbar-menu
+    .navbar-item
+      color: $yellow
+
+      &:hover
+        background-color: $light
+        color: $dark
+
+
+  border-bottom: 2px solid $yellow

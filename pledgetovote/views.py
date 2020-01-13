@@ -47,32 +47,49 @@ class Signup(CreateView):
         return super().get_context_data(**kwargs)
 
 
+class Dashboard(TemplateView):
+    template_name = 'pledgetovote/dashboard.html'
 
     def get_context_data(self, **kwargs):
+        sc = StrikeCircle.objects.get(id=self.request.user.strikecircle.id)
         context = super().get_context_data(**kwargs)
-        context['verb'] = self.verb
+        print(sc.pledge_set.all())
+        context.update({
+            'pledge_thermometer': {
+                'goal': sc.pledge_goal,
+                'current': len(sc.pledge_set.all())
+            },
+            'one_on_one_thermometer': {
+                'goal': sc.one_on_one_goal,
+                'current': len(sc.pledge_set.filter(one_on_one=True))
+            }
+        })
 
         return context
 
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({'instance': self.get_object()})
-        return kwargs
+class UpdateStrikeCircle(UpdateView):
+    model = StrikeCircle
+    fields = ['name', 'pledge_goal', 'one_on_one_goal']
+    template_name = 'pledgetovote/base_form.html'
+    success_url = reverse_lazy('pledgetovote:dashboard')
+
+    def get_context_data(self, **kwargs):
+        kwargs['form_submit_name'] = "Update"
+        return super().get_context_data(**kwargs)
+
+    def get_object(self):
+        sc = StrikeCircle.objects.get(id=self.request.user.strikecircle.id)
+        print(sc)
+        return sc
 
 
-"""
-The view where users can set their Location, either by choosing an existing Location or creating a
-new one.
-"""
-class SetLocation(FormView):
-    model = Location
-    form_class = LocationForm
-    template_name = 'pledgetovote/set_location.html'
+class PledgeEntry(View):
+    pass
 
 
-
-
+class OverallDash(View):
+    pass
 
 
 """Displays a list of all Pledges."""

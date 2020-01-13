@@ -1,0 +1,36 @@
+@import "./base_template.sass"
+
+$therm-width: 150px
+$therm-height: 400px
+
+.thermometer-container
+    height: $therm-height
+    display: flex
+    flex-direction: row
+
+    .thermometer-labels
+        height: $therm-height
+        padding-right: 8px
+        font-size: 15px
+        font-weight: bold
+        color: $yellow
+
+        .goals
+            position: relative
+
+    .thermometer
+        border: 5px solid $light
+        border-radius: 15px
+        height: 100%
+        width: $therm-width
+        display: flex
+        flex-direction: row
+        align-items: start
+        overflow: hidden
+        background: linear-gradient(#DD1111, $yellow)
+
+        .thermometer-cover
+            border-bottom: 2px solid $dark
+            background-color: $grey
+            height: 100%
+            width: 100%
