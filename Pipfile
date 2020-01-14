@@ -17,6 +17,7 @@ pillow = "*"
 libsass = "*"
 django-sass-processor = "*"
 django-bulma = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.7"
