@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -33,7 +35,7 @@ class Signup(CreateView):
             authenticated_user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
             if authenticated_user is not None:
                 login(request, authenticated_user)
-                return HttpResponseRedirect(self.get_success_url())
+                return HttpResponseRedirect(self.success_url)
             else:
                 sc.delete()
                 user.delete()
@@ -47,22 +49,39 @@ class Signup(CreateView):
         return super().get_context_data(**kwargs)
 
 
-class Dashboard(TemplateView):
+class Dashboard(LoginRequiredMixin, TemplateView):
     template_name = 'pledgetovote/dashboard.html'
 
+    @staticmethod
+    def get_graph_data(sc, agg_fn):
+        start_date = Pledge.FIRST_SC_MEETING_WEEK
+        end_date = Pledge.FIRST_SC_MEETING_WEEK + timedelta(weeks=Pledge.NUM_DATA_COLLECTION_WEEKS)
+        return {
+            'start_date': start_date.isoformat(),
+            'end_date': end_date.isoformat(),
+            'by_week': getattr(sc, agg_fn)()
+        }
+
     def get_context_data(self, **kwargs):
-        sc = StrikeCircle.objects.get(id=self.request.user.strikecircle.id)
+        sc = StrikeCircle.objects.get(user__id=self.request.user.id)
+        pledge_graph_data = Dashboard.get_graph_data(sc, 'num_pledges_by_week')
+        one_on_one_graph_data = Dashboard.get_graph_data(sc, 'num_one_on_ones_by_week')
+
+        pledge_graph_data.update({'label': "Pledges"})
+        one_on_one_graph_data.update({'label': "One on Ones"})
+
         context = super().get_context_data(**kwargs)
-        print(sc.pledge_set.all())
         context.update({
             'pledge_thermometer': {
                 'goal': sc.pledge_goal,
                 'current': len(sc.pledge_set.all())
             },
+            'pledge_graph': pledge_graph_data,
             'one_on_one_thermometer': {
                 'goal': sc.one_on_one_goal,
-                'current': len(sc.pledge_set.filter(one_on_one=True))
-            }
+                'current': len(sc.pledge_set.filter(one_on_one__isnull=False))
+            },
+            'one_on_one_graph': one_on_one_graph_data
         })
 
         return context

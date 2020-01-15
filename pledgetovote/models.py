@@ -13,6 +13,21 @@ class StrikeCircle(models.Model):
     one_on_one_goal = models.IntegerField(default=0)
     user = models.OneToOneField(User, on_delete=models.PROTECT)
 
+    def num_pledges_by_week(self):
+        by_week = []
+        for i, week_start_date in enumerate(Pledge.DATA_COLLECTED_DATES):
+            by_week[i] = len(self.pledge_set.filter(date_entered__week__lte=week_start_date.isocalendar()[1]))
+
+        return by_week
+
+    def num_one_on_ones_by_week(self):
+        by_week = []
+        for i, week_start_date in enumerate(Pledge.DATA_COLLECTED_DATES):
+            by_week[i] = len(self.pledge_set.filter(one_on_one__isnull=False,
+                                                    one_on_one__week__lte=week_start_date.isocalendar()[1]))
+
+        return by_week
+
     def __str__(self):
         return f"<StrikeCircle {self.name}>"
 

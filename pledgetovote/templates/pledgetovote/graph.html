@@ -1,0 +1,13 @@
+{% load sass_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/graph.sass' %}">
+{% endblock %}
+
+<div class="graph-container">
+    {{ data.by_week|json_script:"weekly-data" }}
+    <canvas class="graph"
+            data-start-date="{{ data.start_date }}"
+            data-end-date="{{ data.end_date }}"
+            data-label="{{ data.label }}"></canvas>
+</div>

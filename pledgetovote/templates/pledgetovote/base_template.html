@@ -7,6 +7,8 @@
 
 {% block css %}
 <link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/base_template.sass' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css"
+      integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
 {% block extra_css %}{% endblock %}
 {% endblock %}
 
@@ -43,6 +45,10 @@
       crossorigin="anonymous"></script>
     <script src="{% static 'pledgetovote/js/base_template.js' %}"></script>
     <script src="https://kit.fontawesome.com/cbbc396880.js" crossorigin="anonymous"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"
+      integrity="sha256-R4pqcOYV8lt7snxMQO/HSbVCFRPMdrhAFMH+vr9giYI="
+      crossorigin="anonymous"></script>
   {% block extra_javascript %}{% endblock %}
 {% endblock %}
 
