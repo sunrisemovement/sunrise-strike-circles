@@ -48,7 +48,7 @@ class Pledge(models.Model):
     FIRST_SC_MEETING_WEEK = date(2020, 2, 10)
     NUM_DATA_COLLECTION_WEEKS = 5
     DATA_COLLECTED_DATES = [(date(2020, 2, 10) + timedelta(weeks=(i - 1)), f'Week {i}')
-                                for i in range(START_WEEK, START_WEEK + NUM_DATA_COLLECTION_WEEKS)]
+                                for i in range(START_WEEK, START_WEEK + NUM_DATA_COLLECTION_WEEKS + 1)]
 
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)

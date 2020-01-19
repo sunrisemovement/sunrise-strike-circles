@@ -7,7 +7,7 @@
 <div class="graph-container">
     {{ data.by_week|json_script:"weekly-data" }}
     <canvas class="graph"
-            data-start-date="{{ data.start_date }}"
-            data-end-date="{{ data.end_date }}"
+            data-start-week-num="{{ data.start_week }}"
+            data-num-weeks="{{ data.num_weeks }}"
             data-label="{{ goal_name|capfirst }}"></canvas>
 </div>

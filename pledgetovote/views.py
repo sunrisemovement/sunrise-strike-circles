@@ -56,11 +56,9 @@ class Dashboard(LoginRequiredMixin, TemplateView):
 
     @staticmethod
     def get_graph_data(sc, agg_fn):
-        start_date = Pledge.FIRST_SC_MEETING_WEEK
-        end_date = Pledge.FIRST_SC_MEETING_WEEK + timedelta(weeks=Pledge.NUM_DATA_COLLECTION_WEEKS)
         return {
-            'start_date': start_date.isoformat(),
-            'end_date': end_date.isoformat(),
+            'start_week': Pledge.START_WEEK,
+            'num_weeks': Pledge.NUM_DATA_COLLECTION_WEEKS,
             'by_week': getattr(sc, agg_fn)()
         }
 

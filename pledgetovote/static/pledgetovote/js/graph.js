@@ -2,41 +2,49 @@ $(document).ready(function() {
     drawGraphs();
 });
 
-const shortDateString = date => `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-
 const drawGraphs = () => {
-    const MS_PER_WEEK = 1000 * 60 * 60 * 24 * 7;
     $('.graph').each(function(_, el) {
         const ctx = $(el);
-        const startDate = new Date($(el).data('startDate'));    
-        const endDate = new Date($(el).data('endDate'));
-        const weeksBetween = (endDate - startDate) / MS_PER_WEEK;
-        const dates = [];
-        let d;
-        for (let i = 0; i < weeksBetween; i++) {
-            d = new Date();
-            d.setDate(startDate.getDate() + (7 * i));
-            dates.push(shortDateString(d));
+
+        const startWeek = parseInt($(el).data('startWeekNum'));
+        const numWeeks = parseInt($(el).data('numWeeks'));
+        const weekLabels = [];
+        for (let i = startWeek; i <= startWeek + numWeeks; i++) {
+            weekLabels.push(`Week ${i}`);
         }
-        const chart = new Chart(ctx, {
+
+        // Removes all trailing weeks of data where no data was entered
+        const data = JSON.parse($('#weekly-data').text());
+        let i = data.length - 2;
+        for (; i >= 0; i--) {
+            if (data[i] != data[i + 1]) {
+                break;
+            }
+        }
+        const parsedData = data.slice(0, i + 2);
+
+        new Chart(ctx, {
             type: 'line',
             data: {
                 datasets: [{
                     label: $(el).data('label'),
-                    data: JSON.parse($('#weekly-data').text()),
-                    backgroundColor: '#222'
+                    fill: false,
+                    data: parsedData,
+                    borderColor: '#222'
                 }]
             },
             options: {
                 scales: {
                     xAxes: [{
                         type: 'category',
-                        labels: dates
+                        labels: weekLabels
                     }],
                     yAxes: [{
                         type: 'linear',
-                        beginAtZero: true,
-                        precision: 0
+                        ticks: {
+                            beginAtZero: true,
+                            precision: 0
+                        }
                     }]
                 }
             }
