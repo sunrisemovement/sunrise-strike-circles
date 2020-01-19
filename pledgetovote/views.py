@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db.models import Count, F
+from django.db.models import Count, F, Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.urls import reverse_lazy
@@ -66,12 +66,11 @@ class Dashboard(LoginRequiredMixin, TemplateView):
 
     @staticmethod
     def get_leaderboard_data(goal_type):
-        goal_field = f'{goal_type}_goal'
-        sc_pledge_counts = Pledge.objects.values('strike_circle').order_by('strike_circle').annotate(current_total=Count('strike_circle'))
+        sc_pledge_counts = Pledge.objects.values('strike_circle').annotate(current_total=Count('strike_circle'))
         objectified = sc_pledge_counts.values('current_total', 'strike_circle')
 
         # Fetch all the StrikeCircles ahead of time so that one doesn't get refetched on every loop iteration
-        strike_circles = StrikeCircle.objects.all().values('id', 'name', goal=F(goal_field))
+        strike_circles = StrikeCircle.objects.all().values('id', 'name', goal=F(f'{goal_type}_goal'))
         with_progress = []
         for sc in objectified:
             strike_circle = strike_circles.get(id=sc['strike_circle'])
@@ -89,27 +88,28 @@ class Dashboard(LoginRequiredMixin, TemplateView):
         return progress_sorted
 
     def get_context_data(self, **kwargs):
+        PLEDGES_DISPLAY_NAME = "pledges"
+        ONE_ON_ONES_DISPLAY_NAME = "one-on-ones"
+
         sc = StrikeCircle.objects.get(user__id=self.request.user.id)
-
-        pledge_graph_data = Dashboard.get_graph_data(sc, 'num_pledges_by_week')
-        one_on_one_graph_data = Dashboard.get_graph_data(sc, 'num_one_on_ones_by_week')
-
-        pledge_graph_data.update({'label': "Pledges"})
-        one_on_one_graph_data.update({'label': "One on Ones"})
 
         context = super().get_context_data(**kwargs)
         context.update({
+            'pledge_text': PLEDGES_DISPLAY_NAME,
+            'one_on_one_text': ONE_ON_ONES_DISPLAY_NAME,
+
             'pledge_thermometer': {
-                'goal': sc.pledge_goal,
-                'current': len(sc.pledge_set.all())
+                'goal': StrikeCircle.objects.aggregate(Sum('pledge_goal'))['pledge_goal__sum'],  # Sum of all pledge goals
+                'current': Pledge.objects.all().count(),
             },
-            'pledge_graph': pledge_graph_data,
+            'pledge_graph': Dashboard.get_graph_data(sc, 'num_pledges_by_week'),
             'pledge_leaderboard': Dashboard.get_leaderboard_data('pledge'),
+
             'one_on_one_thermometer': {
-                'goal': sc.one_on_one_goal,
-                'current': len(sc.pledge_set.filter(one_on_one__isnull=False))
+                'goal': StrikeCircle.objects.aggregate(Sum('one_on_one_goal'))['one_on_one_goal__sum'],  # Sum of all 1-on-1 goals
+                'current': Pledge.objects.filter(one_on_one__isnull=False).count(),
             },
-            'one_on_one_graph': one_on_one_graph_data,
+            'one_on_one_graph': Dashboard.get_graph_data(sc, 'num_one_on_ones_by_week'),
             'one_on_one_leaderboard': Dashboard.get_leaderboard_data('one_on_one')
         })
 

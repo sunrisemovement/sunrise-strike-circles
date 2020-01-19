@@ -15,16 +15,19 @@ class StrikeCircle(models.Model):
 
     def num_pledges_by_week(self):
         by_week = []
-        for i, week_start_date in enumerate(Pledge.DATA_COLLECTED_DATES):
-            by_week[i] = len(self.pledge_set.filter(date_entered__week__lte=week_start_date.isocalendar()[1]))
+        for _, week_start_date in enumerate(Pledge.DATA_COLLECTED_DATES):
+            week_num = week_start_date[0].isocalendar()[1]
+            num_in_week = self.pledge_set.filter(date_collected__week__lte=week_num).count()
+            by_week.append(num_in_week)
 
         return by_week
 
     def num_one_on_ones_by_week(self):
         by_week = []
-        for i, week_start_date in enumerate(Pledge.DATA_COLLECTED_DATES):
-            by_week[i] = len(self.pledge_set.filter(one_on_one__isnull=False,
-                                                    one_on_one__week__lte=week_start_date.isocalendar()[1]))
+        for _, week_start_date in enumerate(Pledge.DATA_COLLECTED_DATES):
+            week_num = week_start_date[0].isocalendar()[1]
+            num_in_week = self.pledge_set.filter(one_on_one__isnull=False, one_on_one__week__lte=week_num).count()
+            by_week.append(num_in_week)
 
         return by_week
 
@@ -33,7 +36,7 @@ class StrikeCircle(models.Model):
 
 
 class Pledge(models.Model):
-    YEAR_CHOICES = [(i, i) for i in range(1900, date.today().year)]
+    YEAR_CHOICES = [(i, i) for i in range(date.today().year, 1900, -1)]
 
     # Strike Circles meet for the first time the week of 2/10/2020, and start canvassing the following week
     DAYS_PER_WEEK = 7

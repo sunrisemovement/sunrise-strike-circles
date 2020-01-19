@@ -5,12 +5,15 @@
 {% endblock %}
 
 <div class="thermometer-container">
-    <div class="thermometer-labels">
-        <div class="goal">Goal: {{ data.goal }}</div>
-        <div class="current-level">Current: {{ data.current }}</div>    
-    </div>
-    <div class="thermometer" data-count="{{ data.current }}" data-goal="{{ data.goal }}">
-        <div class="thermometer-cover"></div>
+    <div class="title is-6 thermometer-title">National {{ goal_name }} goal progress</div>
+    <div class="thermometer-inner-container">
+        <div class="thermometer-labels">
+            <div class="goal">Goal: {{ data.goal }}</div>
+            <div class="current-level">Current: {{ data.current }}</div>
+        </div>
+        <div class="thermometer" data-count="{{ data.current }}" data-goal="{{ data.goal }}">
+            <div class="thermometer-cover"></div>
+        </div>
     </div>
 </div>
 

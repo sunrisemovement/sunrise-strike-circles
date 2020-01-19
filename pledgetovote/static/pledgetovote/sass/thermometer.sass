@@ -6,31 +6,35 @@ $therm-height: 400px
 .thermometer-container
     height: $therm-height
     display: flex
-    flex-direction: row
+    flex-direction: column
 
-    .thermometer-labels
-        height: $therm-height
-        padding-right: 8px
-        font-size: 15px
-        font-weight: bold
-        color: $dark
-
-        .goals
-            position: relative
-
-    .thermometer
-        border: 5px solid $dark
-        border-radius: 15px
-        height: 100%
-        width: $therm-width
+    .thermometer-inner-container
         display: flex
         flex-direction: row
-        align-items: start
-        overflow: hidden
-        background: linear-gradient(#DD1111, $yellow)
 
-        .thermometer-cover
-            border-bottom: 2px solid $dark
-            background-color: $grey
+        .thermometer-labels
+            height: $therm-height
+            padding-right: 8px
+            font-size: 15px
+            font-weight: bold
+            color: $dark
+
+            .goals
+                position: relative
+
+        .thermometer
+            border: 5px solid $dark
+            border-radius: 15px
             height: 100%
-            width: 100%
+            width: $therm-width
+            display: flex
+            flex-direction: row
+            align-items: start
+            overflow: hidden
+            background: linear-gradient(#DD1111, $yellow)
+
+            .thermometer-cover
+                border-bottom: 2px solid $dark
+                background-color: $grey
+                height: 100%
+                width: 100%
