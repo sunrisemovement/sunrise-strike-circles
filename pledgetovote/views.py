@@ -63,8 +63,8 @@ class Dashboard(LoginRequiredMixin, TemplateView):
         }
 
     @staticmethod
-    def get_leaderboard_data(goal_type):
-        sc_pledge_counts = Pledge.objects.values('strike_circle').annotate(current_total=Count('strike_circle'))
+    def get_leaderboard_data(goal_type, qs):
+        sc_pledge_counts = qs.values('strike_circle').annotate(current_total=Count('strike_circle'))
         objectified = sc_pledge_counts.values('current_total', 'strike_circle')
 
         # Fetch all the StrikeCircles ahead of time so that one doesn't get refetched on every loop iteration
@@ -101,14 +101,14 @@ class Dashboard(LoginRequiredMixin, TemplateView):
                 'current': Pledge.objects.all().count(),
             },
             'pledge_graph': Dashboard.get_graph_data(sc, 'num_pledges_by_week'),
-            'pledge_leaderboard': Dashboard.get_leaderboard_data('pledge'),
+            'pledge_leaderboard': Dashboard.get_leaderboard_data('pledge', Pledge.objects.all()),
 
             'one_on_one_thermometer': {
                 'goal': StrikeCircle.objects.aggregate(Sum('one_on_one_goal'))['one_on_one_goal__sum'],  # Sum of all 1-on-1 goals
                 'current': Pledge.objects.filter(one_on_one__isnull=False).count(),
             },
             'one_on_one_graph': Dashboard.get_graph_data(sc, 'num_one_on_ones_by_week'),
-            'one_on_one_leaderboard': Dashboard.get_leaderboard_data('one_on_one')
+            'one_on_one_leaderboard': Dashboard.get_leaderboard_data('one_on_one', Pledge.objects.filter(one_on_one__isnull=False))
         })
 
         return context
