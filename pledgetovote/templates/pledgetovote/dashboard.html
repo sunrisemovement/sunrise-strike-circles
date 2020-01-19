@@ -10,16 +10,17 @@
 {% block content %}
 <div class="dashboard">
     <div class="title is-2 dashboard-title">Strike Circle Central</div>
-    <div class="title">Pledges to Strike</div>
     <div class="pledge-data">
         {% include 'pledgetovote/thermometer.html' with data=pledge_thermometer %}
         {% include 'pledgetovote/graph.html' with data=pledge_graph %}
+        {% include 'pledgetovote/leaderboard.html' with data=pledge_leaderboard %}
     </div>
     <hr class="hr">
     <div class="title">One on Ones</div>
     <div class="one-on-one-data">
         {% include 'pledgetovote/thermometer.html' with data=one_on_one_thermometer %}
         {% include 'pledgetovote/graph.html' with data=one_on_one_graph %}
+        {% include 'pledgetovote/leaderboard.html' with data=one_on_one_leaderboard %}
     </div>
 </div>
 {% endblock %}

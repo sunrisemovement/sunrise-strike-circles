@@ -1,0 +1,21 @@
+{% load sass_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/leaderboard.sass' %}">
+{% endblock %}
+
+<div class="leaderboard-container">
+    <div class="title is-5">Leaderboard</div>
+    <div class="leaderboard-header columns">
+        <div class="column">Strike circle</div>
+        <div class="column">Goal</div>
+        <div class="column">Current total (% completed)</div>
+    </div>
+    {% for leader in data %}
+    <div class="leaderboard columns">
+        <div class="column is-size-7">{{ leader.name }}</div>
+        <div class="column is-size-7">{{ leader.goal }}</div>
+        <div class="column is-size-7">{{ leader.current_total }} ({{ leader.progress }}%)</div>
+    </div>
+    {% endfor %}
+</div>
