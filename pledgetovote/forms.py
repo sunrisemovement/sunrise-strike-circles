@@ -41,10 +41,31 @@ class SignupForm(forms.ModelForm):
 
 
 class StrikeCircleCreateForm(forms.ModelForm):
-
     class Meta:
         model = StrikeCircle
         fields = ['name']
         labels = {
             'name': "Strike Circle name"
+        }
+
+
+class StrikeCircleEditForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+
+        # Don't allow Strike Circle goals to be changed once they've been set to something other than 0
+        if instance:
+            if instance.pledge_goal > 0:
+                self.fields['pledge_goal'].disabled = True
+            if instance.one_on_one_goal > 0:
+                self.fields['one_on_one_goal'].disabled = True
+
+    class Meta:
+        model = StrikeCircle
+        fields = ['name', 'pledge_goal', 'one_on_one_goal']
+        labels = {
+            'name': "Strike Circle name",
+            'pledge_goal': "Pledge goal (can't be edited once set)",
+            'one_on_one_goal': "One-on-one goal (can't be edited once set)"
         }

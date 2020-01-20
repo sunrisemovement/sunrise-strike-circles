@@ -13,7 +13,7 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
-from pledgetovote.forms import SignupForm, StrikeCircleCreateForm
+from pledgetovote.forms import SignupForm, StrikeCircleCreateForm, StrikeCircleEditForm
 from pledgetovote.models import Pledge, StrikeCircle
 
 
@@ -116,8 +116,8 @@ class Dashboard(LoginRequiredMixin, TemplateView):
 
 class UpdateStrikeCircle(UpdateView):
     model = StrikeCircle
-    fields = ['name', 'pledge_goal', 'one_on_one_goal']
-    template_name = 'pledgetovote/base_form.html'
+    form_class = StrikeCircleEditForm
+    template_name = 'pledgetovote/sc_edit_form.html'
     success_url = reverse_lazy('pledgetovote:dashboard')
 
     def get_context_data(self, **kwargs):
