@@ -16,23 +16,28 @@
 <div class="container">
     <nav class="navbar">
       <div class="navbar-brand">
-        <a class="navbar-item" href="{% url 'pledgetovote:org_dash' %}">
+        <a class="navbar-item" href="https://sunrisemovement.org/">
           <img src="{% static 'pledgetovote/sunrise_logo.png' %}" alt="Sunrise Movement: Pledge to Vote">
         </a>
-
-        <div role="button" class="navbar-burger burger" aria-expanded="false" data-target="pledgeMenu">
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </div>
       </div>
 
       <div id="pledgeMenu" class="navbar-menu">
         <div class="navbar-start">
           <a class="navbar-item" href="{% url 'pledgetovote:dashboard' %}">Dashboard</a>
-          <a class="navbar-item" href="{% url 'pledgetovote:sc_edit' %}">Settings</a>
-          <a class="navbar-item" href="{% url 'logout' %}">Log out</a>
+          <a class="navbar-item" href="{% url 'pledgetovote:data_entry_dash' %}">Pledges</a>
         </div>
+      </div>
+
+      <div class="navbar-end">
+        <a class="navbar-item" href="{% url 'pledgetovote:sc_edit' %}">Settings</a>
+        <a class="navbar-item" href="{% url 'logout' %}">Log out</a>
+      </div>
+
+      <div role="button" class="navbar-burger burger" aria-expanded="false" data-target="pledgeMenu">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
       </div>
     </nav>
   </div>

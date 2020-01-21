@@ -1,0 +1,26 @@
+{% extends 'pledgetovote/dashboard.html' %}
+
+{% load static %}
+
+{% block pledges %}
+{% include 'pledgetovote/graph.html' with data=pledge_graph goal_name=pledge_text %}
+{% include 'pledgetovote/thermometer.html' with data=pledge_thermometer goal_name=pledge_text %}
+{% include 'pledgetovote/listdisplay.html' with data=pledge_leaderboard goal_name=pledge_text list_type="leaderboard" %}
+{% endblock %}
+
+{% block one_on_ones %}
+{% include 'pledgetovote/graph.html' with data=one_on_one_graph goal_name=one_on_one_text %}
+{% include 'pledgetovote/thermometer.html' with data=one_on_one_thermometer goal_name=one_on_one_text %}
+{% include 'pledgetovote/listdisplay.html' with data=one_on_one_leaderboard goal_name=one_on_one_text list_type="leaderboard" %}
+{% endblock %}
+
+
+{% block extra_javascript %}
+<!--
+    These JS files have to be added here, rather than in the template files they relate to (thermometer.html, graph.html, etc),
+    because bulma/base.html puts extra_javascript at the bottom of the page...so if we added the scripts in their respective template files,
+    those scripts would load before jQuery had loaded, and would throw errors.
+-->
+<script type="text/javascript" src="{% static 'pledgetovote/js/thermometer.js' %}"></script>
+<script type="text/javascript" src="{% static 'pledgetovote/js/graph.js' %}"></script>
+{% endblock %}

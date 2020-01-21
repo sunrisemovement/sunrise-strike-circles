@@ -1,5 +1,5 @@
 import copy
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -52,7 +52,7 @@ class Signup(CreateView):
 
 
 class Dashboard(LoginRequiredMixin, TemplateView):
-    template_name = 'pledgetovote/dashboard.html'
+    template_name = 'pledgetovote/vis_dashboard.html'
 
     @staticmethod
     def get_graph_data(sc, agg_fn):
@@ -72,29 +72,34 @@ class Dashboard(LoginRequiredMixin, TemplateView):
         with_progress = []
         for sc in objectified:
             strike_circle = strike_circles.get(id=sc['strike_circle'])
-            new_sc = copy.copy(sc)
-            new_sc.update({
-                'progress': int((sc['current_total'] / strike_circle['goal']) * 100),
-                'name': strike_circle['name'],
-                'goal': strike_circle['goal']
-            })
+            new_sc = [
+                strike_circle['name'],
+                strike_circle['goal'],
+                sc['current_total'],
+                int((sc['current_total'] / strike_circle['goal']) * 100)
+            ]
             with_progress.append(new_sc)
 
         # Sort the top 10 StrikeCircles by progress percentage on the goal
-        progress_sorted = sorted(with_progress, key=lambda s: s['progress'], reverse=True)[:10]
+        progress_sorted = sorted(with_progress, key=lambda s: s[3], reverse=True)[:10]
 
-        return progress_sorted
+        # Store the current total and percentage completed in a single field
+        for sc in progress_sorted:
+            sc[2] = f'{sc[2]} ({sc[3]}%)'
+            del sc[3]
+
+        return {
+            'header_row': ['Strike circle', 'Goal', 'Current total (% completed)'],
+            'data': progress_sorted
+        }
 
     def get_context_data(self, **kwargs):
-        PLEDGES_DISPLAY_NAME = "pledges"
-        ONE_ON_ONES_DISPLAY_NAME = "one-on-ones"
-
         sc = StrikeCircle.objects.get(user__id=self.request.user.id)
 
         context = super().get_context_data(**kwargs)
         context.update({
-            'pledge_text': PLEDGES_DISPLAY_NAME,
-            'one_on_one_text': ONE_ON_ONES_DISPLAY_NAME,
+            'pledge_text': Pledge.PLEDGES_TEMPLATE_NAME,
+            'one_on_one_text': Pledge.ONE_ON_ONES_TEMPLATE_NAME,
 
             'pledge_thermometer': {
                 'goal': StrikeCircle.objects.aggregate(Sum('pledge_goal'))['pledge_goal__sum'],  # Sum of all pledge goals
@@ -114,6 +119,94 @@ class Dashboard(LoginRequiredMixin, TemplateView):
         return context
 
 
+class DataEntry(LoginRequiredMixin, TemplateView):
+    template_name = 'pledgetovote/data_entry_dashboard.html'
+
+    def post(self, request, *args, **kwargs):
+        add_one_on_ones = request.POST.get('add_one_on_ones')
+        # If the form for adding one-on-ones is submitted with no data, the POST data will look like:
+        # { ..., 'add_one_on_ones': [''], ...}
+        if add_one_on_ones and add_one_on_ones[0] != '':
+            de_stringed = list(map(int, add_one_on_ones))
+            Pledge.objects.filter(id__in=de_stringed).update(one_on_one=date.today())
+
+        return HttpResponseRedirect("")
+
+    @staticmethod
+    # This method assumes that the headers, fields, and col_classes are in the same order
+    def get_listdisplay_data(qs, headers, fields, id=None, col_classes=[], hidden_fields=[]):
+        template_data = {'header_row': headers}
+        all_data = qs.values(*fields, *hidden_fields)
+
+        if col_classes:
+            template_data.update(col_classes=col_classes)
+
+        if id:
+            template_data.update(id=id)
+
+        if hidden_fields:
+            hidden_data = []
+            data = []
+
+            for datum in all_data:
+                hidden_row_data = {}
+                row_data = []
+
+                for key in datum.keys():
+                    # Hidden fields are stored as k/v pairs instead of in arrays, so that
+                    # in the template, they can be stored as data attributes with the same
+                    # name as the original field
+                    if key in hidden_fields:
+                        hidden_row_data[key] = datum[key]
+                    else:
+                        row_data.append(datum[key])
+
+                hidden_data.append(hidden_row_data)
+                data.append(row_data)
+
+            template_data.update({
+                'hidden_data': hidden_data,
+                'data': data
+            })
+        else:
+            template_data['data'] = all_data.values_list(*fields)
+
+        return template_data
+
+    def get_context_data(self, **kwargs):
+        sc = StrikeCircle.objects.get(user__id=self.request.user.id)
+
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'pledge_text': Pledge.PLEDGES_TEMPLATE_NAME,
+            'one_on_one_text': Pledge.ONE_ON_ONES_TEMPLATE_NAME,
+
+            'pledges': self.get_listdisplay_data(
+                sc.pledge_set.all().order_by('-date_created'),
+                ['First', 'Last', 'Phone', 'Email', 'Zipcode'],
+                ['first_name', 'last_name', 'phone', 'email', 'zipcode'],
+                col_classes=['is-2', 'is-2', 'is-3', 'is-3', 'is-2']
+            ),
+            'no_one_on_one': self.get_listdisplay_data(
+                sc.pledge_set.filter(one_on_one__isnull=True).order_by('-date_created'),
+                ['First', 'Last'], ['first_name', 'last_name'],
+                id='no-one-on-one', hidden_fields=['id']
+            ),
+            'selected_one_on_ones': self.get_listdisplay_data(
+                Pledge.objects.none(),
+                ['First', 'Last'], ['first_name', 'last_name'],
+                id='selected-one-on-ones', hidden_fields=['id']
+            ),
+            'completed_one_on_ones': self.get_listdisplay_data(
+                sc.pledge_set.filter(one_on_one__isnull=False).order_by('-one_on_one'),
+                ['First', 'Last'], ['first_name', 'last_name'],
+                id='completed-one-on-ones'
+            )
+        })
+
+        return context
+
+
 class UpdateStrikeCircle(UpdateView):
     model = StrikeCircle
     form_class = StrikeCircleEditForm
@@ -127,14 +220,6 @@ class UpdateStrikeCircle(UpdateView):
     def get_object(self):
         sc = StrikeCircle.objects.get(id=self.request.user.strikecircle.id)
         return sc
-
-
-class PledgeEntry(View):
-    pass
-
-
-class OverallDash(View):
-    pass
 
 
 """Displays a list of all Pledges."""

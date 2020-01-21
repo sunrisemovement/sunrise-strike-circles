@@ -50,6 +50,10 @@ class Pledge(models.Model):
     DATA_COLLECTED_DATES = [(date(2020, 2, 10) + timedelta(weeks=(i - 1)), f'Week {i}')
                                 for i in range(START_WEEK, START_WEEK + NUM_DATA_COLLECTION_WEEKS + 1)]
 
+    PLEDGES_TEMPLATE_NAME = "pledges"
+    ONE_ON_ONES_TEMPLATE_NAME = "one-on-ones"
+
+
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.CharField(max_length=100, validators=[EmailValidator], unique=True)

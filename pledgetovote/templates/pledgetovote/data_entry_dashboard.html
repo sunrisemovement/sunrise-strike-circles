@@ -1,0 +1,32 @@
+{% extends 'pledgetovote/dashboard.html' %}
+
+{% load static sass_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/dashboard.sass' %}">
+<link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/data_entry_dashboard.sass' %}">
+{% endblock %}
+
+{% block pledges %}
+{% include 'pledgetovote/listdisplay.html' with data=pledges %}
+{% endblock %}
+
+{% block one_on_ones %}
+{% include 'pledgetovote/listdisplay.html' with data=no_one_on_one list_type="Select people with new one-on-ones" %}
+<div>
+    <form method="post" id="one-on-one-form">
+        {% csrf_token %}
+        {% include 'pledgetovote/listdisplay.html' with data=selected_one_on_ones list_type="Selected" %}
+        <input type="hidden" name="add_one_on_ones">
+        <input class="button" id="submit-one-on-ones" type="submit" value="Confirm" disabled>
+    </form>
+</div>
+{% include 'pledgetovote/listdisplay.html' with data=completed_one_on_ones list_type="Completed one-on-ones" %}
+{% endblock %}
+
+{% block extra_javascript %}
+<!--
+    These JS files have to be added here, rather than in the template files they relate to. See vis_dashboard.html for details.
+-->
+<script type="text/javascript" src="{% static 'pledgetovote/js/data_entry_dashboard.js' %}"></script>
+{% endblock %}

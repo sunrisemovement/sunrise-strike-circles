@@ -1,0 +1,27 @@
+@import "./base_template.sass"
+    
+.listdisplay-container
+    margin-left: 30px
+
+    .listdisplay-header
+        color: $yellow
+        background-color: $dark
+        padding: 0 15px
+
+    .listdisplay
+        padding: 0 15px
+
+        &:nth-child(even)
+            background-color: $grey
+
+
+        &:hover
+            color: $yellow
+            background-color: $dark
+
+        .column p
+            text-overflow: ellipsis
+            white-space: nowrap
+            overflow: hidden
+
+                
