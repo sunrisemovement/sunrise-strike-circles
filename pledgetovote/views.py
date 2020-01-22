@@ -1,5 +1,5 @@
 import copy
-from datetime import date, timedelta
+import datetime
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,7 +13,7 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
-from pledgetovote.forms import SignupForm, StrikeCircleCreateForm, StrikeCircleEditForm
+from pledgetovote.forms import CreatePledge, SignupForm, StrikeCircleCreateForm, StrikeCircleEditForm
 from pledgetovote.models import Pledge, StrikeCircle
 
 
@@ -124,11 +124,24 @@ class DataEntry(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         add_one_on_ones = request.POST.get('add_one_on_ones')
-        # If the form for adding one-on-ones is submitted with no data, the POST data will look like:
-        # { ..., 'add_one_on_ones': [''], ...}
-        if add_one_on_ones and add_one_on_ones[0] != '':
-            de_stringed = list(map(int, add_one_on_ones))
-            Pledge.objects.filter(id__in=de_stringed).update(one_on_one=date.today())
+        checked_fields_pledge_form = self._check_post_fields(['first_name', 'last_name', 'email', 'phone', 'yob', 'zipcode', 'date_collected'], request.POST)
+        checked_fields_one_on_one_form = self._check_post_fields(['add_one_on_ones'], request.POST)
+        if checked_fields_pledge_form:
+            cfpf = checked_fields_pledge_form
+            pledge = Pledge(
+                first_name=cfpf['first_name'],
+                last_name=cfpf['last_name'],
+                email=cfpf['email'],
+                phone=cfpf['phone'],
+                yob=int(cfpf['yob']),
+                zipcode=cfpf['zipcode'],
+                date_collected=datetime.datetime.strptime(cfpf['date_collected'], '%Y-%m-%d').date(),
+                strike_circle=StrikeCircle.objects.get(user__id=self.request.user.id)
+                )
+            pledge.save()
+        elif checked_fields_one_on_one_form:
+            de_stringed = list(map(int, checked_fields_one_on_one_form['add_one_on_ones'].split(',')))
+            Pledge.objects.filter(id__in=de_stringed).update(one_on_one=datetime.date.today())
 
         return HttpResponseRedirect("")
 
@@ -175,12 +188,16 @@ class DataEntry(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         sc = StrikeCircle.objects.get(user__id=self.request.user.id)
+        week_choices = Pledge.DATA_COLLECTED_DATES
+        formatted_choices = [(d.isoformat(), n) for d, n in week_choices]
 
         context = super().get_context_data(**kwargs)
         context.update({
             'pledge_text': Pledge.PLEDGES_TEMPLATE_NAME,
             'one_on_one_text': Pledge.ONE_ON_ONES_TEMPLATE_NAME,
 
+            'week_choices': formatted_choices,
+            'pledge_form': CreatePledge(),
             'pledges': self.get_listdisplay_data(
                 sc.pledge_set.all().order_by('-date_created'),
                 ['First', 'Last', 'Phone', 'Email', 'Zipcode'],
@@ -206,6 +223,20 @@ class DataEntry(LoginRequiredMixin, TemplateView):
 
         return context
 
+    # Checks that each of the fields given is actually in the POST data. If it is, the key/value pair field:value is
+    # added to the dictionary that's returned. If any field is missing from the POST data, None is returned.
+    @staticmethod
+    def _check_post_fields(fields, post_data):
+        data = {}
+        for field in fields:
+            gotten = post_data.get(field)
+            if not gotten:
+                return None
+            else:
+                data[field] = gotten
+
+        return data
+
 
 class UpdateStrikeCircle(UpdateView):
     model = StrikeCircle
@@ -220,22 +251,3 @@ class UpdateStrikeCircle(UpdateView):
     def get_object(self):
         sc = StrikeCircle.objects.get(id=self.request.user.strikecircle.id)
         return sc
-
-
-"""Displays a list of all Pledges."""
-class PledgeList(LoginRequiredMixin, ListView):
-    model = Pledge
-    context_object_name = 'pledge_list'
-    queryset = Pledge.objects.all().order_by('-id')
-    paginate_by = 50
-
-"""The view where new Pledges can be created."""
-class CreatePledge(CreateView):
-    verb = 'Create'
-    model = Pledge
-
-
-"""The view where existing Pledges can be updated."""
-class UpdatePledge(UpdateView):
-    verb = 'Update'
-    model = Pledge

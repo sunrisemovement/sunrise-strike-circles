@@ -1,9 +1,46 @@
 @import "./base_template.sass"
 
-.dashboard .one-on-one-data
-    align-items: unset
+.dashboard
+    .one-on-one-data
+        align-items: unset
 
-    #one-on-one-form #submit-one-on-ones
-        margin: 20px 0 0 35px
-        background-color: $yellow
-        color: $dark
+        #one-on-one-form #submit-one-on-ones
+            margin: 20px 0 0 35px
+            background-color: $yellow
+            color: $dark
+
+    .pledge-data
+        .pledge-entry-container
+            .weeks-container
+                display: flex
+                flex-direction: column
+                justify-items: space-between
+
+                .title
+                    margin-top: 1rem
+                    margin-bottom: .5rem
+
+                .week
+                    padding: 10px
+                    margin: 10px
+                    border-radius: 4px
+                    background-color: $grey
+                    color: $dark
+                    text-align: center
+
+            #pledge-form
+                text-align: center
+                display: none
+
+                #back-to-week
+                    text-align: left
+                    font-size: 12px
+
+                    &:hover
+                        text-decoration: underline
+                        cursor: pointer
+
+                #submit-pledge
+                    margin-top: 15px
+                    background-color: $yellow
+                    color: $dark

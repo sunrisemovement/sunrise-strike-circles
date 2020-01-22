@@ -1,6 +1,6 @@
 {% extends 'pledgetovote/dashboard.html' %}
 
-{% load static sass_tags %}
+{% load static sass_tags bulma_tags %}
 
 {% block extra_css %}
 <link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/dashboard.sass' %}">
@@ -8,6 +8,22 @@
 {% endblock %}
 
 {% block pledges %}
+<div class="pledge-entry-container">
+    <div class="title is-5">Enter new pledge</div>
+    <div class="weeks-container">
+        <div class="title is-6">When is this data from?</div>
+        {% for date, week_name in week_choices %}
+        <div class="week" data-date="{{ date }}">{{ week_name }}</div>
+        {% endfor %}
+    </div>
+    <form id="pledge-form" method="post">
+        <div id="back-to-week">&lt; Back to week</div>
+        {% csrf_token %}
+        {{ pledge_form|bulma }}
+        <input type="hidden" name="date_collected">
+        <input id="submit-pledge" class="button" type="submit" value="Submit Pledge">
+    </form>
+</div>
 {% include 'pledgetovote/listdisplay.html' with data=pledges %}
 {% endblock %}
 

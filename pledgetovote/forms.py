@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from pledgetovote.models import StrikeCircle
+from pledgetovote.models import Pledge, StrikeCircle
 
 
 class SignupForm(forms.ModelForm):
@@ -68,4 +68,13 @@ class StrikeCircleEditForm(forms.ModelForm):
             'name': "Strike Circle name",
             'pledge_goal': "Pledge goal (can't be edited once set)",
             'one_on_one_goal': "One-on-one goal (can't be edited once set)"
+        }
+
+
+class CreatePledge(forms.ModelForm):
+    class Meta:
+        model = Pledge
+        fields = ['first_name', 'last_name', 'email', 'phone', 'zipcode', 'yob']
+        labels: {
+            'yob': "Year of birth"
         }

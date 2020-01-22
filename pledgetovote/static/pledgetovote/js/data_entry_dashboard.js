@@ -1,6 +1,19 @@
 $(document).ready(function() {
-    const listDisplayRowEl = ' .listdisplay.columns';
+    // When a week option is clicked, set the pledge form's date_collected input to the date corresponding
+    // to the week that was clicked
+    $('.week').click(function() {
+        const date = $(this).data('date');
+        $('#pledge-form input[name="date_collected"]').val(date);
+        $(this).parent().css('display', 'none');
+        $('#pledge-form').css('display', 'block');
+    });
 
+    $('#back-to-week').click(function() {
+        $(this).parent().css('display', 'none');
+        $('.weeks-container').css('display', 'block');
+    })
+
+    const listDisplayRowEl = ' .listdisplay.columns';
     // Click on pledges that haven't had one-on-ones to select/deselect them for having one-on-ones added
     $('#no-one-on-one' + listDisplayRowEl).click(function() {
         if (!$(this).data('selected')) {
