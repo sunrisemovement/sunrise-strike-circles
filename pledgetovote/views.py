@@ -251,3 +251,7 @@ class UpdateStrikeCircle(UpdateView):
     def get_object(self):
         sc = StrikeCircle.objects.get(id=self.request.user.strikecircle.id)
         return sc
+
+
+class ProgramGuide(TemplateView):
+    template_name = 'pledgetovote/program_guide.html'
