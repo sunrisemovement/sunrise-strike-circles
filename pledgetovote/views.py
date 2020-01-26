@@ -96,6 +96,11 @@ class Dashboard(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         sc = StrikeCircle.objects.get(user__id=self.request.user.id)
 
+        # Don't include Week 2 in the one-on-ones graph
+        one_on_one_graph = Dashboard.get_graph_data(sc, 'num_one_on_ones_by_week')
+        one_on_one_graph['start_week'] += 1
+        one_on_one_graph['num_weeks'] -= 1
+
         context = super().get_context_data(**kwargs)
         context.update({
             'pledge_text': Pledge.PLEDGES_TEMPLATE_NAME,
@@ -112,7 +117,7 @@ class Dashboard(LoginRequiredMixin, TemplateView):
                 'goal': StrikeCircle.objects.aggregate(Sum('one_on_one_goal'))['one_on_one_goal__sum'],  # Sum of all 1-on-1 goals
                 'current': Pledge.objects.filter(one_on_one__isnull=False).count(),
             },
-            'one_on_one_graph': Dashboard.get_graph_data(sc, 'num_one_on_ones_by_week'),
+            'one_on_one_graph': one_on_one_graph,
             'one_on_one_leaderboard': Dashboard.get_leaderboard_data('one_on_one', Pledge.objects.filter(one_on_one__isnull=False))
         })
 

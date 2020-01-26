@@ -12,9 +12,11 @@ const drawGraphs = () => {
         for (let i = startWeek; i <= startWeek + numWeeks; i++) {
             weekLabels.push(`Week ${i}`);
         }
+        weekLabels[weekLabels.length - 1] = 'Post Strike Circle';
+
+        const data = JSON.parse($(this).parent().find('#weekly-data').text());
 
         // Removes all trailing weeks of data where no data was entered
-        const data = JSON.parse($('#weekly-data').text());
         let i = data.length - 2;
         for (; i >= 0; i--) {
             if (data[i] != data[i + 1]) {
