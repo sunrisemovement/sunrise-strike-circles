@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models import Count, F, Sum
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView
@@ -43,7 +43,7 @@ class Signup(CreateView):
                 user.delete()
                 raise ValidationError("Could not log in user after signing up. Please retry user creation.")
 
-        return self.render_to_response(self.get_context_data(form=user_form))
+        return render(request, self.template_name, self.get_context_data(form=user_form))
 
     def get_context_data(self, **kwargs):
         kwargs['form_submit_name'] = "Sign up"
