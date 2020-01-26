@@ -90,6 +90,7 @@ class Dashboard(LoginRequiredMixin, TemplateView):
 
         return {
             'header_row': ['Strike circle', 'Goal', 'Current total (% completed)'],
+            'col_classes': ['is-6', 'is-2', 'is-4'],
             'data': progress_sorted
         }
 
@@ -213,17 +214,17 @@ class DataEntry(LoginRequiredMixin, TemplateView):
             'no_one_on_one': self.get_listdisplay_data(
                 sc.pledge_set.filter(one_on_one__isnull=True).order_by('-date_created'),
                 ['First', 'Last'], ['first_name', 'last_name'],
-                id='no-one-on-one', hidden_fields=['id']
+                id='no-one-on-one', hidden_fields=['id'], col_classes=['is-6', 'is-6']
             ),
             'selected_one_on_ones': self.get_listdisplay_data(
                 Pledge.objects.none(),
                 ['First', 'Last'], ['first_name', 'last_name'],
-                id='selected-one-on-ones', hidden_fields=['id']
+                id='selected-one-on-ones', hidden_fields=['id'], col_classes=['is-6', 'is-6']
             ),
             'completed_one_on_ones': self.get_listdisplay_data(
                 sc.pledge_set.filter(one_on_one__isnull=False).order_by('-one_on_one'),
                 ['First', 'Last'], ['first_name', 'last_name'],
-                id='completed-one-on-ones'
+                id='completed-one-on-ones', col_classes=['is-6', 'is-6']
             )
         })
 
