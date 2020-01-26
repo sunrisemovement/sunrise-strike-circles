@@ -124,10 +124,10 @@ class DataEntry(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         add_one_on_ones = request.POST.get('add_one_on_ones')
-        checked_fields_pledge_form = self._check_post_fields(['first_name', 'last_name', 'email', 'phone', 'yob', 'zipcode', 'date_collected'], request.POST)
-        checked_fields_one_on_one_form = self._check_post_fields(['add_one_on_ones'], request.POST)
-        if checked_fields_pledge_form:
-            cfpf = checked_fields_pledge_form
+        checked_pledge_form = self._check_post_fields(['first_name', 'last_name', 'email', 'phone', 'yob', 'zipcode', 'date_collected'], request.POST)
+        checked_one_on_one_form = self._check_post_fields(['add_one_on_ones'], request.POST)
+        if checked_pledge_form:
+            cfpf = checked_pledge_form  # Just assigning a shorter variable name for brevity when creating Pledge below
             pledge = Pledge(
                 first_name=cfpf['first_name'],
                 last_name=cfpf['last_name'],
@@ -139,8 +139,8 @@ class DataEntry(LoginRequiredMixin, TemplateView):
                 strike_circle=StrikeCircle.objects.get(user__id=self.request.user.id)
                 )
             pledge.save()
-        elif checked_fields_one_on_one_form:
-            de_stringed = list(map(int, checked_fields_one_on_one_form['add_one_on_ones'].split(',')))
+        elif checked_one_on_one_form:
+            de_stringed = list(map(int, checked_one_on_one_form['add_one_on_ones'].split(',')))
             Pledge.objects.filter(id__in=de_stringed).update(one_on_one=datetime.date.today())
 
         return HttpResponseRedirect("")
@@ -188,6 +188,7 @@ class DataEntry(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         sc = StrikeCircle.objects.get(user__id=self.request.user.id)
+
         week_choices = Pledge.DATA_COLLECTED_DATES
         formatted_choices = [(d.isoformat(), n) for d, n in week_choices]
 

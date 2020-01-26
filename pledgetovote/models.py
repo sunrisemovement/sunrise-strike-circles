@@ -47,7 +47,7 @@ class Pledge(models.Model):
     """
     FIRST_SC_MEETING_WEEK = date(2020, 2, 10)
     NUM_DATA_COLLECTION_WEEKS = 5
-    DATA_COLLECTED_DATES = [(date(2020, 2, 10) + timedelta(weeks=(i - 1)), f'Week {i}')
+    DATA_COLLECTED_DATES = [(date(2020, 2, 10) + timedelta(weeks=(i - 1)), f'Week {i}' if i is not 7 else 'Post Strike Circle')
                                 for i in range(START_WEEK, START_WEEK + NUM_DATA_COLLECTION_WEEKS + 1)]
 
     PLEDGES_TEMPLATE_NAME = "pledges"
