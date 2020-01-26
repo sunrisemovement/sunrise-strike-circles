@@ -2,11 +2,11 @@
 {% load static %}
 {% load sass_tags %}
 
-{% block subtitle %}Pledges{% endblock %}
+{% block subtitle %}Pledges{% endblock subtitle %}
 
 {% block extra_css %}
 <link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/pledge_list.sass' %}">
-{% endblock %}
+{% endblock extra_css %}
 
 {% block content %}
 
@@ -82,8 +82,8 @@
 </div>
 {% endif %}
 
-{% endblock %}
+{% endblock content %}
 
 {% block extra_javascript %}
 <script type="text/javascript" src="{% static 'pledgetovote/js/pledge_list.js' %}"></script>
-{% endblock %}
+{% endblock extra_javascript %}

@@ -2,7 +2,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/graph.sass' %}">
-{% endblock %}
+{% endblock extra_css %}
 
 <div class="graph-container">
     {{ data.by_week|json_script:"weekly-data" }}

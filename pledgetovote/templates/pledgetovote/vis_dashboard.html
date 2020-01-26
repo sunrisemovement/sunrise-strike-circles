@@ -6,13 +6,13 @@
 {% include 'pledgetovote/graph.html' with data=pledge_graph goal_name=pledge_text %}
 {% include 'pledgetovote/thermometer.html' with data=pledge_thermometer goal_name=pledge_text %}
 {% include 'pledgetovote/listdisplay.html' with data=pledge_leaderboard goal_name=pledge_text list_type="leaderboard" %}
-{% endblock %}
+{% endblock pledges %}
 
 {% block one_on_ones %}
 {% include 'pledgetovote/graph.html' with data=one_on_one_graph goal_name=one_on_one_text %}
 {% include 'pledgetovote/thermometer.html' with data=one_on_one_thermometer goal_name=one_on_one_text %}
 {% include 'pledgetovote/listdisplay.html' with data=one_on_one_leaderboard goal_name=one_on_one_text list_type="leaderboard" %}
-{% endblock %}
+{% endblock one_on_ones %}
 
 
 {% block extra_javascript %}
@@ -23,4 +23,4 @@
 -->
 <script type="text/javascript" src="{% static 'pledgetovote/js/thermometer.js' %}"></script>
 <script type="text/javascript" src="{% static 'pledgetovote/js/graph.js' %}"></script>
-{% endblock %}
+{% endblock extra_javascript %}

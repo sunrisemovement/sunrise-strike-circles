@@ -3,11 +3,11 @@
 {% load static %}
 {% load sass_tags %}
 
-{% block subtitle %}New Pledge{% endblock %}
+{% block subtitle %}New Pledge{% endblock subtitle %}
 
 {% block extra_css %}
 <link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/pledge_form.sass' %}">
-{% endblock %}
+{% endblock extra_css %}
 
 {% block content %}
 <h3 class="title">{{ verb }} pledge</h3>
@@ -48,8 +48,8 @@
     <input type="submit" name="submit" class="button is-primary" value="{{ verb }}">
     <input type="submit" name="submit-create-next" class="button is-info" value="Finish and create next">
 </div>
-{% endblock %}
+{% endblock content %}
 
 {% block extra_javascript %}
 <script type="text/javascript" src="{% static 'pledgetovote/js/pledge_form.js' %}"></script>
-{% endblock %}
+{% endblock extra_javascript %}

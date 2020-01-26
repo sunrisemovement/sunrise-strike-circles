@@ -2,7 +2,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/listdisplay.sass' %}">
-{% endblock %}
+{% endblock extra_css %}
 
 {% if data.id %}
 <div class="listdisplay-container" id="{{ data.id }}">

@@ -5,7 +5,7 @@
 {% block extra_css %}
 <link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/dashboard.sass' %}">
 <link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/data_entry_dashboard.sass' %}">
-{% endblock %}
+{% endblock extra_css %}
 
 {% block pledges %}
 <div class="pledge-entry-container">
@@ -25,7 +25,7 @@
     </form>
 </div>
 {% include 'pledgetovote/listdisplay.html' with data=pledges %}
-{% endblock %}
+{% endblock pledges %}
 
 {% block one_on_ones %}
 {% include 'pledgetovote/listdisplay.html' with data=no_one_on_one list_type="Select people with new one-on-ones" %}
@@ -38,11 +38,11 @@
     </form>
 </div>
 {% include 'pledgetovote/listdisplay.html' with data=completed_one_on_ones list_type="Completed one-on-ones" %}
-{% endblock %}
+{% endblock one_on_ones %}
 
 {% block extra_javascript %}
 <!--
     These JS files have to be added here, rather than in the template files they relate to. See vis_dashboard.html for details.
 -->
 <script type="text/javascript" src="{% static 'pledgetovote/js/data_entry_dashboard.js' %}"></script>
-{% endblock %}
+{% endblock extra_javascript %}

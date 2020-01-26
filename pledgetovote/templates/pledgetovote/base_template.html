@@ -3,14 +3,14 @@
 {% load sass_tags %}
 {% load bulma_tags %}
 
-{% block title %}Pledge to Vote | {% block subtitle %}{% endblock %}{% endblock %}
+{% block title %}Pledge to Vote | {% block subtitle %}{% endblock subtitle %}{% endblock title %}
 
 {% block css %}
 <link rel="stylesheet" type="text/css" href="{% sass_src 'pledgetovote/sass/base_template.sass' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css"
       integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
 {% block extra_css %}{% endblock %}
-{% endblock %}
+{% endblock css %}
 
 {% block header %}
 <div class="container">
@@ -41,7 +41,7 @@
       </div>
     </nav>
   </div>
-{% endblock %}
+{% endblock header %}
 
 {% block javascript %}
     <script
@@ -54,7 +54,7 @@
       src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"
       integrity="sha256-R4pqcOYV8lt7snxMQO/HSbVCFRPMdrhAFMH+vr9giYI="
       crossorigin="anonymous"></script>
-  {% block extra_javascript %}{% endblock %}
-{% endblock %}
+  {% block extra_javascript %}{% endblock extra_javascript %}
+{% endblock javascript %}
 
-{% block footer %}{% endblock %}
+{% block footer %}{% endblock footer %}
