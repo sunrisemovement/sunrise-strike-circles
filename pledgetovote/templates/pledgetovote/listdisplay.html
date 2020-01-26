@@ -33,11 +33,7 @@
         {% endif %}
     >
         {% for datum in row %}
-        {% if data.col_classes %}
         <div class="column {{ data.col_classes|index:forloop.counter0 }}">
-        {% else %}
-        <div class="column">
-        {% endif %}
             <p title="{{ datum }}" class="is-8">{{ datum }}</p>
         </div>
         {% endfor %}
