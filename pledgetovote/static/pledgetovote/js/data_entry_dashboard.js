@@ -1,17 +1,13 @@
 $(document).ready(function() {
-    // When a week option is clicked, set the pledge form's date_collected input to the date corresponding
-    // to the week that was clicked
-    $('.week').click(function() {
-        const date = $(this).data('date');
-        $('#pledge-form input[name="date_collected"]').val(date);
-        $(this).parent().css('display', 'none');
-        $('#pledge-form').css('display', 'block');
+    // When a week option is selected, set the pledge form's date_collected input to the date corresponding
+    // to the week that was selected
+    $('#choose-week').change(function() {
+        const week = $(this).val();
+        $('#pledge-form input[name="date_collected"]').val(week);
     });
 
-    $('#back-to-week').click(function() {
-        $(this).parent().css('display', 'none');
-        $('.weeks-container').css('display', 'block');
-    })
+    // Set hidden date input to the initial value of the dropdown used to select the week
+    $('#pledge-form input[name="date_collected"]').val($('#choose-week').val());
 
     const listDisplayRowEl = ' .listdisplay.columns';
     // Click on pledges that haven't had one-on-ones to select/deselect them for having one-on-ones added

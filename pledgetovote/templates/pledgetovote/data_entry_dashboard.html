@@ -10,14 +10,13 @@
 {% block pledges %}
 <div class="pledge-entry-container">
     <div class="title is-5">Enter new pledge</div>
-    <div class="weeks-container">
-        <div class="title is-6">When is this data from?</div>
-        {% for date, week_name in week_choices %}
-        <div class="week" data-date="{{ date }}">{{ week_name }}</div>
-        {% endfor %}
-    </div>
+        <div class="title is-7">When was this pledge signed up?</div>
+        <select id="choose-week">
+            {% for date, week_name in week_choices %}
+            <option value="{{ date }}">{{ week_name }}</option>
+            {% endfor %}
+        </select>
     <form id="pledge-form" method="post">
-        <div id="back-to-week">&lt; Back to week</div>
         {% csrf_token %}
         {{ pledge_form|bulma }}
         <input type="hidden" name="date_collected">

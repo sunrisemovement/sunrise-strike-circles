@@ -11,34 +11,25 @@
 
     .pledge-data
         .pledge-entry-container
-            .weeks-container
-                display: flex
-                flex-direction: column
-                justify-items: space-between
+            .title.is-7
+                margin-bottom: .75rem
 
-                .title
-                    margin-top: 1rem
-                    margin-bottom: .5rem
-
-                .week
-                    padding: 10px
-                    margin: 10px
-                    border-radius: 4px
-                    background-color: $grey
-                    color: $dark
-                    text-align: center
+            #choose-week
+                margin-bottom: 25px
+                padding: 5px
 
             #pledge-form
                 text-align: center
-                display: none
+                max-width: 40rem
+                display: flex
+                flex-direction: row
+                flex-wrap: wrap
 
-                #back-to-week
-                    text-align: left
-                    font-size: 12px
+                .field
+                    min-width: 18rem
 
-                    &:hover
-                        text-decoration: underline
-                        cursor: pointer
+                    &:nth-child(odd)
+                        margin-left: 10px
 
                 #submit-pledge
                     margin-top: 15px
