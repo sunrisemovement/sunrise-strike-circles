@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.urls import path
 from django.conf.urls.static import static
 
-from strikecircle.views import Dashboard, DataEntry, ProgramGuide, Signup, UpdateStrikeCircle
+from strikecircle.views import Dashboard, DataEntry, ProgramGuide, UpdateStrikeCircle
 
 app_name = 'strikecircle'
 urlpatterns = [
@@ -11,5 +11,4 @@ urlpatterns = [
     path('data-entry/', DataEntry.as_view(), name='data_entry_dash'),
     path('profile/', UpdateStrikeCircle.as_view(), name='sc_edit'),
     path('program-guide/', ProgramGuide.as_view(), name='program_guide'),
-    path('signup/', Signup.as_view(), name='signup')
 ]
