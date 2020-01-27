@@ -1,6 +1,8 @@
 {% extends "registration/base.html" %}
 {% load i18n %}
 
+{% block subtitle %}Logged out{% endblock subtitle %}
+
 {% block content %}
   <p class="content">{% trans "Thanks for using the Sunrise Movement's Strike Circles site!" %}</p>
   <p><a class="button is-success" href="{% url 'login' %}">{% trans 'Log in again' %}</a></p>
