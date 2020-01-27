@@ -1,0 +1,43 @@
+{% extends 'base_template.html' %}
+{% load sass_tags static %}
+
+{% block subtitle %}Progress Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'strikecircle/sass/progress_dashboard.sass' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="title is-3 dashboard-title">Strike Circle Progress Dashboard</div>
+    <div class="growth-chart">
+        <div class="level">
+            <div class="level-left">
+                <div class="title is-5 growth-chart-title">{{ sc.name }} Growth Chart</div>
+            </div>
+            {% if sc.pledge_goal is 0 or sc.one_on_one_goal is 0 %}
+            <div class="level-right">
+                <a href="{% url 'strikecircle:sc_edit' %}"><div class="sunrise-button">Set goals</div></a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="tabs">
+            <input type="radio" name="tabs" id="tab1" checked>
+            <label for="tab1">{{ pledge_text }}</label>
+            <input type="radio" name="tabs" id="tab2">
+            <label for="tab2">{{ one_on_one_text }}</label>
+
+            <div id="tab-content1" class="tab-content">
+                {% include 'strikecircle/graph.html' with data=pledge_graph_data %}                    
+            </div>
+            <div id="tab-content2" class="tab-content">
+                {% include 'strikecircle/graph.html' with data=one_on_one_graph_data %}                    
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_javascript %}
+    <script type="text/javascript" src="{% static 'strikecircle/js/graph.js' %}"></script>
+{% endblock extra_javascript %}
