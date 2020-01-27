@@ -42,29 +42,36 @@ const drawGraphs = () => {
                 maintainAspectRatio: false,
                 legend: { display: false },
                 tooltips: {
+                    displayColors: false,
                     callbacks: {
-                        title: tooltipItem => `${tooltipItem[0].value} ${goalType}`,
-                        label: _ => false
+                        title: _ => '',
+                        label: tooltipItem => `${tooltipItem.value} ${goalType}`,
+                        labelTextColor: _ => '#FFDE16'
                     }
                 },
                 scales: {
                     xAxes: [{
                         type: 'category',
-                        labels: weekLabels
+                        labels: weekLabels,
+                        gridLines: {
+                            zeroLineWidth: 2,
+                            zeroLineColor: '#AAA'
+                        }
                     }],
                     yAxes: [{
                         gridLines: {
                             borderDash: [5, 15],
-                            lineWidth: 2
+                            lineWidth: 2,
+                            zeroLineWidth: 2,
+                            zeroLineColor: '#AAA'
                         },
                         ticks: {
                             min: 0,
-                            max: Math.trunc(goal * 1.15),
-                            callback: value => `Goal: ${value} ${goalType}`
+                            max: Math.ceil(goal * 1.15),
+                            callback: value => value > 0 ? `Goal: ${value} ${goalType}` : ''
                         },
                         afterBuildTicks: axis => {
-                            axis.ticks = [];
-                            axis.ticks.push(goal);
+                            axis.ticks = [0, goal];
                         }
                     }]
                 }

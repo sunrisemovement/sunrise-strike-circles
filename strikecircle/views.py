@@ -123,10 +123,11 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
         pledge_graph = ProgressDashboard.get_graph_data(sc, 'pledge')
         pledge_graph['goal_type'] = 'pledges'
 
-                # Don't include Week 2 in the one-on-ones graph
+        # Don't include Week 2 in the one-on-ones graph
         one_on_one_graph = ProgressDashboard.get_graph_data(sc, 'one_on_one')
         one_on_one_graph['start_week'] += 1
         one_on_one_graph['num_weeks'] -= 1
+        one_on_one_graph['goal_type'] = 'one-on-ones'
 
         context.update({
             'pledge_text': Pledge.PLEDGES_TEMPLATE_NAME,
