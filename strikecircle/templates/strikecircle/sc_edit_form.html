@@ -1,0 +1,14 @@
+{% extends 'strikecircle/base_template.html' %}
+{% load bulma_tags %}
+
+{% block subtitle %}Edit Strike Circle{% endblock subtitle %}
+
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form|bulma }}
+    <input type="submit" value="Update">
+</form>
+<br><br>
+<p>(Note: if you <em>really</em> need to change your goals once you've already set them, contact Luis Marchese or Jesse Evers on Slack.)</p>
+{% endblock content %}

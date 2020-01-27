@@ -1,0 +1,42 @@
+{% load sass_tags ptv_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'strikecircle/sass/listdisplay.sass' %}">
+{% endblock extra_css %}
+
+{% if data.id %}
+<div class="listdisplay-container" id="{{ data.id }}">
+{% else %}
+<div class="listdisplay-container">
+{% endif %}
+    <div class="title is-7">{{ goal_name|capfirst }} {{ list_type }} </div>
+    <div class="listdisplay-header columns">
+        {% for header in data.header_row %}
+        {% if data.col_classes %}
+        <div class="column {{ data.col_classes|index:forloop.counter0 }}">
+        {% else %}
+        <div class="column">
+        {% endif %}
+            <p class="is-7">{{ header }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% for row in data.data %}
+    <!-- Add any hidden data as data attributes on the row container -->
+    <div data-index="{{ forloop.counter }}" class="listdisplay columns"
+        {% if data.hidden_data %}
+        {% with data.hidden_data|index:forloop.counter0 as hidden_row_data %}
+        {% for key, val in hidden_row_data.items %}
+        data-{{ key }}="{{ val }}"
+        {% endfor %}
+        {% endwith %}
+        {% endif %}
+    >
+        {% for datum in row %}
+        <div class="column {{ data.col_classes|index:forloop.counter0 }}">
+            <p title="{{ datum }}" class="is-8">{{ datum }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>

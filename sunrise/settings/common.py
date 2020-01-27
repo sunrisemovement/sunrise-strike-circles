@@ -26,7 +26,7 @@ SECRET_KEY = env('SECRET_KEY')
 # Application definition
 
 INSTALLED_APPS = [
-    'pledgetovote',
+    'strikecircle',
     'localflavor',
     'phonenumber_field',
     'sass_processor',
@@ -151,10 +151,10 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': os.path.join(LOGGING_ROOT, 'django.log')
         },
-        'pledgetovote_file': {
+        'strikecircle_file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGGING_ROOT, 'pledgetovote.log')
+            'filename': os.path.join(LOGGING_ROOT, 'strikecircle.log')
         }
     },
     'loggers': {
@@ -163,8 +163,8 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True
         },
-        'pledgetovote': {
-            'handlers': ['console', 'pledgetovote_file'],
+        'strikecircle': {
+            'handlers': ['console', 'strikecircle_file'],
             'level': 'DEBUG',
             'propagate': True
         }
