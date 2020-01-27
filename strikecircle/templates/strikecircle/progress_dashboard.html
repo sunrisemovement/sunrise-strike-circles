@@ -21,17 +21,33 @@
             </div>
             {% endif %}
         </div>
-        <div class="tabs">
-            <input type="radio" name="tabs" id="tab1" checked>
-            <label for="tab1">{{ pledge_text }}</label>
-            <input type="radio" name="tabs" id="tab2">
-            <label for="tab2">{{ one_on_one_text }}</label>
+        <div class="tabs" id="growth-tabs">
+            <input type="radio" name="growth-tabs" id="chart-tab1" checked>
+            <label for="chart-tab1">{{ pledge_text }}</label>
+            <input type="radio" name="growth-tabs" id="chart-tab2">
+            <label for="chart-tab2">{{ one_on_one_text }}</label>
 
-            <div id="tab-content1" class="tab-content">
+            <div id="tab-chart1" class="tab-content">
                 {% include 'strikecircle/graph.html' with data=pledge_graph_data %}                    
             </div>
-            <div id="tab-content2" class="tab-content">
+            <div id="tab-chart2" class="tab-content">
                 {% include 'strikecircle/graph.html' with data=one_on_one_graph_data %}                    
+            </div>
+        </div>
+    </div>
+    <div class="national-progress">
+        <div class="level-left">
+            <div class="title is-5 national-progress-title">National Progress</div>
+        </div>
+        <div class="tabs" id="national-tabs">
+            <input type="radio" name="national-tabs" id="national-tab1" checked>
+            <label for="national-tab1">{{ pledge_text }}</label>
+            <input type="radio" name="national-tabs" id="national-tab2">
+            <label for="national-tab2">{{ one_on_one_text }}</label>
+
+            <div id="tab-national1" class="tab-content">
+            </div>
+            <div id="tab-national2" class="tab-content">
             </div>
         </div>
     </div>
