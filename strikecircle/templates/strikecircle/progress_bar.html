@@ -5,7 +5,7 @@
 {% endblock extra_css %}
 
 <div class="progress-bar-container">
-    <div class="title is-6 progress-bar-title">Goal tracker</div>
+    <div class="title is-6 progress-bar-title">{{ goal_name|capfirst }} goal tracker</div>
     <div class="progress-bar" data-count="{{ data.current }}" data-goal="{{ data.goal }}">
         <span class="progress-label">{{ data.current }} / {{ data.goal }} {{ goal_type }}</span>
         <div class="progress-bar-cover"></div>

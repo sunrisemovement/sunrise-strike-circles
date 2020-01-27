@@ -84,7 +84,7 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
             with_progress.append(new_sc)
 
         # Sort the top 10 StrikeCircles by progress percentage on the goal
-        progress_sorted = sorted(with_progress, key=lambda s: s[3], reverse=True)[:10]
+        progress_sorted = sorted(with_progress, key=lambda s: s[3], reverse=True)[:5]
 
         # Store the current total and percentage completed in a single field
         for sc in progress_sorted:
@@ -101,24 +101,6 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
         sc = StrikeCircle.objects.get(user__id=self.request.user.id)
 
         context = super().get_context_data(**kwargs)
-        # context.update({
-        #     'pledge_text': Pledge.PLEDGES_TEMPLATE_NAME,
-        #     'one_on_one_text': Pledge.ONE_ON_ONES_TEMPLATE_NAME,
-
-        #     'pledge_thermometer': {
-        #         'goal': StrikeCircle.objects.aggregate(Sum('pledge_goal'))['pledge_goal__sum'],  # Sum of all pledge goals
-        #         'current': Pledge.objects.all().count(),
-        #     },
-        #     'pledge_graph': Dashboard.get_graph_data(sc, 'num_pledges_by_week'),
-        #     'pledge_leaderboard': Dashboard.get_leaderboard_data('pledge', Pledge.objects.all()),
-
-        #     'one_on_one_thermometer': {
-        #         'goal': StrikeCircle.objects.aggregate(Sum('one_on_one_goal'))['one_on_one_goal__sum'],  # Sum of all 1-on-1 goals
-        #         'current': Pledge.objects.filter(one_on_one__isnull=False).count(),
-        #     },
-        #     'one_on_one_graph': one_on_one_graph,
-        #     'one_on_one_leaderboard': Dashboard.get_leaderboard_data('one_on_one', Pledge.objects.filter(one_on_one__isnull=False))
-        # })
 
         pledge_graph = ProgressDashboard.get_graph_data(sc, 'pledge')
         pledge_graph['goal_type'] = 'pledges'
@@ -141,10 +123,13 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
                 'goal': StrikeCircle.objects.aggregate(Sum('pledge_goal'))['pledge_goal__sum'],  # Sum of all pledge goals
                 'current': Pledge.objects.all().count()
             },
+            'pledge_leaderboard_data': ProgressDashboard.get_leaderboard_data('pledge', Pledge.objects.all()),
+
             'one_on_one_progress_bar_data': {
                 'goal': StrikeCircle.objects.aggregate(Sum('one_on_one_goal'))['one_on_one_goal__sum'],  # Sum of all 1-on-1 goals
                 'current': Pledge.objects.filter(one_on_one__isnull=False).count()
-            }
+            },
+            'one_on_one_leaderboard_data': ProgressDashboard.get_leaderboard_data('one_on_one', Pledge.objects.filter(one_on_one__isnull=False))
         })
 
         return context
