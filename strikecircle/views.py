@@ -135,7 +135,16 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
 
             'sc': sc,
             'pledge_graph_data': pledge_graph,
-            'one_on_one_graph_data': one_on_one_graph
+            'one_on_one_graph_data': one_on_one_graph,
+
+            'pledge_progress_bar_data': {
+                'goal': StrikeCircle.objects.aggregate(Sum('pledge_goal'))['pledge_goal__sum'],  # Sum of all pledge goals
+                'current': Pledge.objects.all().count()
+            },
+            'one_on_one_progress_bar_data': {
+                'goal': StrikeCircle.objects.aggregate(Sum('one_on_one_goal'))['one_on_one_goal__sum'],  # Sum of all 1-on-1 goals
+                'current': Pledge.objects.filter(one_on_one__isnull=False).count()
+            }
         })
 
         return context

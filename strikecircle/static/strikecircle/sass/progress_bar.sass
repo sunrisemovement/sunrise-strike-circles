@@ -1,0 +1,29 @@
+@import "./base_template.sass"
+
+$therm-width: 400px
+$therm-height: 80px
+
+.progress-bar-container
+    width: $therm-width
+
+    .progress-bar
+        border: 2px solid $dark
+        border-radius: 15px
+        width: $therm-width
+        height: $therm-height
+        overflow: hidden
+        background: linear-gradient(to right, $yellow, #DD1111)
+        text-align: center
+        position: relative
+
+        .progress-label
+            position: absolute
+            line-height: $therm-height
+            left: 33%
+            color: $dark
+            font-weight: 500
+
+        .progress-bar-cover
+            float: right
+            background-color: $light
+            height: $therm-height

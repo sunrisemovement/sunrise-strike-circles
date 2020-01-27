@@ -1,0 +1,20 @@
+{% load sass_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'strikecircle/sass/progress_bar.sass' %}">
+{% endblock extra_css %}
+
+<div class="progress-bar-container">
+    <div class="title is-6 progress-bar-title">Goal tracker</div>
+    <div class="progress-bar" data-count="{{ data.current }}" data-goal="{{ data.goal }}">
+        <span class="progress-label">{{ data.current }} / {{ data.goal }} {{ goal_type }}</span>
+        <div class="progress-bar-cover"></div>
+    </div>
+</div>
+
+<!--
+    Requires strikecircle/js/progress_bar.js, but that has to be added to the extra_javascript block
+    in the template that includes this template, because bulma/base.html puts extra_javascript at the
+    bottom of the page...so if we added the progress_bar.js script here, it would load before jQuery has
+    loaded, and cause an error.
+-->
