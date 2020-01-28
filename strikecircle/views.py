@@ -140,7 +140,23 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
 
 
 class DataInput(LoginRequiredMixin, TemplateView):
-    model = Pledge
+    model = Pledgeersions for date fields on input form
+Latest commitersions for date fields on input form
+Latest commit
+1f8f076
+8 hours ago
+Type 	Name 	Latest commit message 	Commit time
+	logs 	Moved LocationForm config to __init__(), small style changes 	2 months ago
+	media 	First commit 	3 months ago
+	static 	Renamed pledgetovote app to strikecircle 	2 days ago
+	strikecircle
+1f8f076
+8 hours ago
+Type 	Name 	Latest commit message 	Commit time
+	logs 	Moved LocationForm config to __init__(), small style changes 	2 months ago
+	media 	First commit 	3 months ago
+	static 	Renamed pledgetovote app to strikecircle 	2 days ago
+	strikecircle
     template_name = 'strikecircle/data_input_dashboard.html'
     context_object_name = 'pledges'
     paginate_by = 20
@@ -153,13 +169,19 @@ class DataInput(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         fields = ['first_name', 'last_name', 'email', 'phone', 'zipcode', 'date_collected', 'one_on_one']
+        hidden_fields = ['id']
+        qs = self.get_queryset()
 
         context.update({
             'table': {
-                'data': self.get_queryset().values_list(*fields),
+                'data': qs.values(*fields),
+                'hidden_data': qs.values(*hidden_fields),
                 'header_row': ['First name', 'Last name', 'Email address', 'Phone number', 'Zipcode', 'Week pledged', 'One-on-one completed?'],
                 'fields': fields,
-                'col_classes': ['is-1', 'is-1', 'is-3', 'is-2', 'is-1', 'is-2', 'is-2']
+                'col_classes': ['is-1', 'is-1', 'is-2', 'is-2', 'is-1', 'is-2', 'is-2']
+            },
+            'misc_data': {
+                'week_map': Pledge.DATA_COLLECTED_DATES
             }
         })
 

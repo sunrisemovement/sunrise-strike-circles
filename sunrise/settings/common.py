@@ -113,7 +113,7 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
 
 USE_TZ = True
 
@@ -173,6 +173,7 @@ LOGGING = {
 
 SITE_URL = env('SITE_URL')
 
+DATE_FORMAT = 'Y-m-d'
 
 # SASS settings
 SASS_PROCESSOR_ROOT = STATIC_ROOT
