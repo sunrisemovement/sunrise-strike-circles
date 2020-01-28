@@ -51,15 +51,18 @@ class Signup(CreateView):
         return super().get_context_data(**kwargs)
 
 
-class Dashboard(LoginRequiredMixin, TemplateView):
-    template_name = 'strikecircle/vis_dashboard.html'
+class ProgressDashboard(LoginRequiredMixin, TemplateView):
+    template_name = 'strikecircle/progress_dashboard.html'
 
     @staticmethod
-    def get_graph_data(sc, agg_fn):
+    def get_graph_data(sc, goal_type):
         return {
             'start_week': Pledge.START_WEEK,
             'num_weeks': Pledge.NUM_DATA_COLLECTION_WEEKS,
-            'by_week': getattr(sc, agg_fn)()
+            'goal': getattr(sc, f'{goal_type}_goal'),
+            # Assumes that for each goal, there's a method named num_<goal-related-field>s_by_week that aggregates (by week) the
+            # number of Pledges belonging to the given StrikeCircle with that goal field completed
+            'by_week': getattr(sc, f'num_{goal_type}s_by_week')()
         }
 
     @staticmethod
@@ -81,7 +84,7 @@ class Dashboard(LoginRequiredMixin, TemplateView):
             with_progress.append(new_sc)
 
         # Sort the top 10 StrikeCircles by progress percentage on the goal
-        progress_sorted = sorted(with_progress, key=lambda s: s[3], reverse=True)[:10]
+        progress_sorted = sorted(with_progress, key=lambda s: s[3], reverse=True)[:5]
 
         # Store the current total and percentage completed in a single field
         for sc in progress_sorted:
@@ -97,29 +100,36 @@ class Dashboard(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         sc = StrikeCircle.objects.get(user__id=self.request.user.id)
 
+        context = super().get_context_data(**kwargs)
+
+        pledge_graph = ProgressDashboard.get_graph_data(sc, 'pledge')
+        pledge_graph['goal_type'] = 'pledges'
+
         # Don't include Week 2 in the one-on-ones graph
-        one_on_one_graph = Dashboard.get_graph_data(sc, 'num_one_on_ones_by_week')
+        one_on_one_graph = ProgressDashboard.get_graph_data(sc, 'one_on_one')
         one_on_one_graph['start_week'] += 1
         one_on_one_graph['num_weeks'] -= 1
+        one_on_one_graph['goal_type'] = 'one-on-ones'
 
-        context = super().get_context_data(**kwargs)
         context.update({
             'pledge_text': Pledge.PLEDGES_TEMPLATE_NAME,
             'one_on_one_text': Pledge.ONE_ON_ONES_TEMPLATE_NAME,
 
-            'pledge_thermometer': {
-                'goal': StrikeCircle.objects.aggregate(Sum('pledge_goal'))['pledge_goal__sum'],  # Sum of all pledge goals
-                'current': Pledge.objects.all().count(),
-            },
-            'pledge_graph': Dashboard.get_graph_data(sc, 'num_pledges_by_week'),
-            'pledge_leaderboard': Dashboard.get_leaderboard_data('pledge', Pledge.objects.all()),
+            'sc': sc,
+            'pledge_graph_data': pledge_graph,
+            'one_on_one_graph_data': one_on_one_graph,
 
-            'one_on_one_thermometer': {
-                'goal': StrikeCircle.objects.aggregate(Sum('one_on_one_goal'))['one_on_one_goal__sum'],  # Sum of all 1-on-1 goals
-                'current': Pledge.objects.filter(one_on_one__isnull=False).count(),
+            'pledge_progress_bar_data': {
+                'goal': StrikeCircle.objects.aggregate(Sum('pledge_goal'))['pledge_goal__sum'],  # Sum of all pledge goals
+                'current': Pledge.objects.all().count()
             },
-            'one_on_one_graph': one_on_one_graph,
-            'one_on_one_leaderboard': Dashboard.get_leaderboard_data('one_on_one', Pledge.objects.filter(one_on_one__isnull=False))
+            'pledge_leaderboard_data': ProgressDashboard.get_leaderboard_data('pledge', Pledge.objects.all()),
+
+            'one_on_one_progress_bar_data': {
+                'goal': StrikeCircle.objects.aggregate(Sum('one_on_one_goal'))['one_on_one_goal__sum'],  # Sum of all 1-on-1 goals
+                'current': Pledge.objects.filter(one_on_one__isnull=False).count()
+            },
+            'one_on_one_leaderboard_data': ProgressDashboard.get_leaderboard_data('one_on_one', Pledge.objects.filter(one_on_one__isnull=False))
         })
 
         return context
@@ -245,7 +255,7 @@ class DataEntry(LoginRequiredMixin, TemplateView):
         return data
 
 
-class UpdateStrikeCircle(UpdateView):
+class UpdateStrikeCircle(LoginRequiredMixin, UpdateView):
     model = StrikeCircle
     form_class = StrikeCircleEditForm
     template_name = 'strikecircle/sc_edit_form.html'
@@ -260,5 +270,5 @@ class UpdateStrikeCircle(UpdateView):
         return sc
 
 
-class ProgramGuide(TemplateView):
+class ProgramGuide(LoginRequiredMixin, TemplateView):
     template_name = 'strikecircle/program_guide.html'

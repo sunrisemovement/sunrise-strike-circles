@@ -9,7 +9,7 @@
 {% else %}
 <div class="listdisplay-container">
 {% endif %}
-    <div class="title is-7">{{ goal_name|capfirst }} {{ list_type }} </div>
+    <div class="title is-6">{{ goal_name|capfirst }} {{ list_type }} </div>
     <div class="listdisplay-header columns">
         {% for header in data.header_row %}
         {% if data.col_classes %}
@@ -21,8 +21,8 @@
         </div>
         {% endfor %}
     </div>
-    {% for row in data.data %}
     <!-- Add any hidden data as data attributes on the row container -->
+    {% for row in data.data %}
     <div data-index="{{ forloop.counter }}" class="listdisplay columns"
         {% if data.hidden_data %}
         {% with data.hidden_data|index:forloop.counter0 as hidden_row_data %}

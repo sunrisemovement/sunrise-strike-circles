@@ -1,0 +1,66 @@
+{% extends 'base_template.html' %}
+{% load sass_tags static %}
+
+{% block subtitle %}Progress Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'strikecircle/sass/progress_dashboard.sass' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="title is-3 dashboard-title">Strike Circle Progress Dashboard</div>
+    <div class="growth-chart">
+        <div class="level">
+            <div class="level-left">
+                <div class="title is-4 growth-chart-title">{{ sc.name }} Growth Chart</div>
+            </div>
+            {% if sc.pledge_goal is 0 or sc.one_on_one_goal is 0 %}
+            <div class="level-right">
+                <a href="{% url 'strikecircle:sc_edit' %}"><div class="sunrise-button">Set goals</div></a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="tabs" id="growth-tabs">
+            <input type="radio" name="growth-tabs" id="chart-tab1" checked>
+            <label for="chart-tab1">{{ pledge_text }}</label>
+            <input type="radio" name="growth-tabs" id="chart-tab2">
+            <label for="chart-tab2">{{ one_on_one_text }}</label>
+
+            <div id="tab-chart1" class="tab-content">
+                {% include 'strikecircle/graph.html' with data=pledge_graph_data %}                    
+            </div>
+            <div id="tab-chart2" class="tab-content">
+                {% include 'strikecircle/graph.html' with data=one_on_one_graph_data %}                    
+            </div>
+        </div>
+    </div>
+    <div class="national-progress">
+        <div class="level">
+            <div class="level-left">
+                <div class="title is-4 national-progress-title">National Progress</div>
+            </div>
+        </div>
+        <div class="tabs" id="national-tabs">
+            <input type="radio" name="national-tabs" id="national-tab1" checked>
+            <label for="national-tab1">{{ pledge_text }}</label>
+            <input type="radio" name="national-tabs" id="national-tab2">
+            <label for="national-tab2">{{ one_on_one_text }}</label>
+
+            <div id="tab-national1" class="tab-content">
+                {% include 'strikecircle/progress_bar.html' with data=pledge_progress_bar_data goal_type=pledge_text goal_name=pledge_text %}
+                {% include 'strikecircle/listdisplay.html' with data=pledge_leaderboard_data goal_name=pledge_text list_type="Leaderboard" %}
+            </div>
+            <div id="tab-national2" class="tab-content">
+                {% include 'strikecircle/progress_bar.html' with data=one_on_one_progress_bar_data goal_type=one_on_one_text goal_name=one_on_one_text %}
+                {% include 'strikecircle/listdisplay.html' with data=one_on_one_leaderboard_data goal_name=one_on_one_text list_type="Leaderboard" %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_javascript %}
+    <script type="text/javascript" src="{% static 'strikecircle/js/graph.js' %}"></script>
+    <script type="text/javascript" src="{% static 'strikecircle/js/progress_bar.js' %}"></script>
+{% endblock extra_javascript %}

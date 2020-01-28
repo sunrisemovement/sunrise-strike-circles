@@ -4,23 +4,23 @@
 
 {% block pledges %}
 {% include 'strikecircle/graph.html' with data=pledge_graph goal_name=pledge_text %}
-{% include 'strikecircle/thermometer.html' with data=pledge_thermometer goal_name=pledge_text %}
+{% include 'strikecircle/progress_bar.html' with data=pledge_progress_bar goal_name=pledge_text %}
 {% include 'strikecircle/listdisplay.html' with data=pledge_leaderboard goal_name=pledge_text list_type="leaderboard" %}
 {% endblock pledges %}
 
 {% block one_on_ones %}
 {% include 'strikecircle/graph.html' with data=one_on_one_graph goal_name=one_on_one_text %}
-{% include 'strikecircle/thermometer.html' with data=one_on_one_thermometer goal_name=one_on_one_text %}
+{% include 'strikecircle/progress_bar.html' with data=one_on_one_progress_bar goal_name=one_on_one_text %}
 {% include 'strikecircle/listdisplay.html' with data=one_on_one_leaderboard goal_name=one_on_one_text list_type="leaderboard" %}
 {% endblock one_on_ones %}
 
 
 {% block extra_javascript %}
 <!--
-    These JS files have to be added here, rather than in the template files they relate to (thermometer.html, graph.html, etc),
+    These JS files have to be added here, rather than in the template files they relate to (progress_bar.html, graph.html, etc),
     because bulma/base.html puts extra_javascript at the bottom of the page...so if we added the scripts in their respective template files,
     those scripts would load before jQuery had loaded, and would throw errors.
 -->
-<script type="text/javascript" src="{% static 'strikecircle/js/thermometer.js' %}"></script>
+<script type="text/javascript" src="{% static 'strikecircle/js/progress_bar.js' %}"></script>
 <script type="text/javascript" src="{% static 'strikecircle/js/graph.js' %}"></script>
 {% endblock extra_javascript %}

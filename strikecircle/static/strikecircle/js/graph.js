@@ -6,8 +6,11 @@ const drawGraphs = () => {
     $('.graph').each(function(_, el) {
         const ctx = $(el);
 
+        const goal = parseInt($(el).data('goal'));
+        const goalType = $(el).data('goalType');
         const startWeek = parseInt($(el).data('startWeekNum'));
         const numWeeks = parseInt($(el).data('numWeeks'));
+
         const weekLabels = [];
         for (let i = startWeek; i <= startWeek + numWeeks; i++) {
             weekLabels.push(`Week ${i}`);
@@ -29,23 +32,46 @@ const drawGraphs = () => {
             type: 'line',
             data: {
                 datasets: [{
-                    label: $(el).data('label'),
                     fill: false,
                     data: parsedData,
-                    borderColor: '#222'
+                    borderColor: '#222',
+                    lineTension: 0  // Draw straight lines between points
                 }]
             },
             options: {
+                maintainAspectRatio: false,
+                legend: { display: false },
+                tooltips: {
+                    displayColors: false,
+                    callbacks: {
+                        title: _ => '',
+                        label: tooltipItem => `${tooltipItem.value} ${goalType}`,
+                        labelTextColor: _ => '#FFDE16'
+                    }
+                },
                 scales: {
                     xAxes: [{
                         type: 'category',
-                        labels: weekLabels
+                        labels: weekLabels,
+                        gridLines: {
+                            zeroLineWidth: 2,
+                            zeroLineColor: '#AAA'
+                        }
                     }],
                     yAxes: [{
-                        type: 'linear',
+                        gridLines: {
+                            borderDash: [5, 15],
+                            lineWidth: 2,
+                            zeroLineWidth: 2,
+                            zeroLineColor: '#AAA'
+                        },
                         ticks: {
-                            beginAtZero: true,
-                            precision: 0
+                            min: 0,
+                            max: Math.ceil(goal * 1.15),
+                            callback: value => value > 0 ? `Goal: ${value} ${goalType}` : ''
+                        },
+                        afterBuildTicks: axis => {
+                            axis.ticks = [0, goal];
                         }
                     }]
                 }
