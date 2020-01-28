@@ -1,13 +1,17 @@
 @import "./base_template.sass"
     
 .table-container
+    overflow: hidden
+
     .table-header, .table-body
         .column
             border-left: 1px solid white
             border-right: 1px solid white
 
-            &:first-child, &:last-child
+            &:first-child
                 border-left: 0
+
+            &:last-child
                 border-right: 0
 
 
@@ -28,7 +32,7 @@
         background-color: #E1E1DA
 
         &:nth-child(even)
-            background-color: $light
+            background-color: $grey
 
         &:hover
             color: $yellow

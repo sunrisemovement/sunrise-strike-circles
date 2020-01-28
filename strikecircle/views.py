@@ -135,6 +135,33 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
         return context
 
 
+class DataInput(LoginRequiredMixin, TemplateView):
+    model = Pledge
+    template_name = 'strikecircle/data_input_dashboard.html'
+    context_object_name = 'pledges'
+    paginate_by = 20
+
+    def get_queryset(self):
+        sc = StrikeCircle.objects.get(user__id=self.request.user.id)
+        return Pledge.objects.filter(strike_circle=sc)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        fields = ['first_name', 'last_name', 'email', 'phone', 'zipcode', 'date_collected', 'one_on_one']
+
+        context.update({
+            'table': {
+                'data': self.get_queryset().values_list(*fields),
+                'header_row': ['First name', 'Last name', 'Email address', 'Phone number', 'Zipcode', 'Week pledged', 'One-on-one completed?'],
+                'fields': fields,
+                'col_classes': ['is-1', 'is-1', 'is-3', 'is-2', 'is-1', 'is-2', 'is-2']
+            }
+        })
+
+        return context
+
+
 class DataEntry(LoginRequiredMixin, TemplateView):
     template_name = 'strikecircle/data_entry_dashboard.html'
 
