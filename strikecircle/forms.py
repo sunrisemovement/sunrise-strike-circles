@@ -74,7 +74,10 @@ class StrikeCircleEditForm(forms.ModelForm):
 class CreatePledge(forms.ModelForm):
     class Meta:
         model = Pledge
-        fields = ['first_name', 'last_name', 'email', 'phone', 'zipcode', 'yob']
-        labels: {
+        fields = ['first_name', 'last_name', 'email', 'phone', 'zipcode', 'yob', 'date_collected', 'one_on_one']
+        labels = {
             'yob': "Year of birth"
+        }
+        widgets = {
+            'one_on_one': forms.CheckboxInput
         }

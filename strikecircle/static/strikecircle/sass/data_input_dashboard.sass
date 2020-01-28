@@ -8,6 +8,56 @@
         .input-table-header
             padding-top: 0.75rem
 
+        #table-input-row
+            display: none
+            background-color: $grey
+
+            .input-column
+                text-align: center
+
+                input, .select-wrapper
+                    position: relative
+                    width: 100%
+                    height: 100%
+                    bottom: .5rem
+
+                input, select
+                    appearance: none
+                    -moz-appearance: none
+                    -webkit-appearance: none
+                    width: 100%
+                    height: 100%
+                    border: 1px solid $dark
+                    background-color: $light
+                    border-radius: 3px
+
+                .select-wrapper::after
+                    $arrow-side-len: 6px
+                    content: ""
+                    position: absolute
+                    float: right
+                    width: 0
+                    height: 0
+                    border-top: $arrow-side-len solid $dark
+                    border-left: $arrow-side-len solid transparent
+                    border-right: $arrow-side-len solid transparent
+                    right: 6px
+                    top: .75rem
+
+                input[type="checkbox"]
+                    width: 1rem
+                    height: 1rem
+                    bottom: .25rem
+                    margin: 0 auto
+
+                    &:checked
+                        &::after
+                            content: "✓"
+                            font-size: 18px
+                            position: absolute
+                            top: -4px
+                            color: $dark
+
     .mode-default
         display: block
 
@@ -16,4 +66,3 @@
 
     .instructions
         font-weight: bold
-

@@ -10,13 +10,14 @@ $(document).ready(function() {
     }
 
     function addModeToggle() {
-        $('#table-input-row').toggle();
+        $('#table-input-row').css('display', 'flex');
         $('.mode-add').toggle();
         $('.mode-default').toggle();
     }
 
     $('#add-pledges-button').click(addModeToggle);
     $('#done-adding-button').click(addModeToggle);
+    $('#cancel-adding-button').click(addModeToggle);
 
     $('p[data-field="date_collected"]').each(function(_, el) {
         $(el).text(dateToWeek($(el).data('value')));

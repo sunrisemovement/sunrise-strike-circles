@@ -3,7 +3,7 @@
 .table-container
     overflow: hidden
 
-    .table-header, .table-body
+    .table-header, .table-row
         .column
             border-left: 1px solid white
             border-right: 1px solid white
@@ -27,9 +27,9 @@
             flex-direction: row
             align-items: center
 
-    .table-body
+    .table-row
         padding: 0 15px
-        background-color: #E1E1DA
+        background-color: $light-grey
 
         &:nth-child(even)
             background-color: $grey
@@ -42,3 +42,4 @@
             text-overflow: ellipsis
             white-space: nowrap
             overflow: hidden
+            font-size: 12px

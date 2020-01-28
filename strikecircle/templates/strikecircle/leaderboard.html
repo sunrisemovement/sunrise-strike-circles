@@ -15,7 +15,7 @@
         {% endfor %}
     </div>
     {% for row in data.data %}
-    <div class="table-body columns">
+    <div class="table-row columns">
         {% for datum in row %}
         <div class="column {{ data.col_classes|index:forloop.counter0 }}">
             <p title="{{ datum }}" class="is-8">{{ datum }}</p>
