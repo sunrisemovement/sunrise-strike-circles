@@ -29,6 +29,7 @@
             <div class="sunrise-button" id="cancel-button">Cancel Adding</div>
         </div>
     </div>
+    {{ misc_data.week_map|json_script:"week-map" }}
     <div class="input-table table-container">
         <div class="input-table-header table-header columns">
             {% for header in table.header_row %}
@@ -45,10 +46,18 @@
             </form>
         </div>
         {% for row in table.data %}
-        <div class="table-body columns">
-            {% for datum in row %}
+        <div class="table-body columns"
+        {% if table.hidden_data %}
+        {% with table.hidden_data|index:forloop.counter0 as hidden_row_data %}
+        {% for key, val in hidden_row_data.items %}
+            data-{{ key }}="{{ val }}"
+        {% endfor %}
+        {% endwith %}
+        {% endif %}
+        >
+            {% for key, val in row.items %}
             <div class="column {{ table.col_classes|index:forloop.counter0 }}">
-                <p title="{{ datum }}" class="is-8">{{ datum }}</p>
+                <p data-field="{{ key }}" data-value="{{ val }}" class="is-8">{{ val }}</p>
             </div>
             {% endfor %}
         </div>
@@ -58,16 +67,5 @@
 {% endblock content %}
 
 {% block extra_javascript %}
-    <script type="text/javascript">
-        $(document).ready(() => {
-            $('#add-pledges-button').click(addModeToggle);
-            $('#done-adding-button').click(addModeToggle);
-        });
-
-        function addModeToggle() {
-            $('#table-input-row').toggle();
-            $('.mode-add').toggle();
-            $('.mode-default').toggle();
-        }
-    </script>
+<script type="text/javascript" src="{% static 'strikecircle/js/data_input_dashboard.js' %}"></script>
 {% endblock extra_javascript %}
