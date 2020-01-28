@@ -75,6 +75,10 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
         with_progress = []
         for sc in objectified:
             strike_circle = strike_circles.get(id=sc['strike_circle'])
+
+            if strike_circle['goal'] == 0:
+                continue
+
             new_sc = [
                 strike_circle['name'],
                 strike_circle['goal'],
