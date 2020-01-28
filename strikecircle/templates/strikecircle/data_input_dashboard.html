@@ -1,0 +1,45 @@
+{% extends 'base_template.html' %}
+{% load sc_tags sass_tags static %}
+
+{% block subtitle %}Data Input{% endblock subtitle %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'strikecircle/sass/table.sass' %}">
+<link rel="stylesheet" type="text/css" href="{% sass_src 'strikecircle/sass/data_input_dashboard.sass' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<div class="data-input">
+    <div class="title is-3 page-title">Strike Circle Pledge Tracker</div>
+    <div class="level">
+        <div class="level-left">
+            <div class="sunrise-button primary">Add new pledges</div>
+        </div>
+        <div class="level-right">
+            <div class="sunrise-button primary">Edit pledges</div>
+        </div>
+    </div>
+    <div class="input-table table-container">
+        <div class="input-table-header table-header columns">
+            {% for header in table.header_row %}
+            <div class="column {{ table.col_classes|index:forloop.counter0 }}">
+                <p class="is-7">{{ header }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% for row in table.data %}
+        <div class="table-body columns">
+            {% for datum in row %}
+            <div class="column {{ table.col_classes|index:forloop.counter0 }}">
+                <p title="{{ datum }}" class="is-8">{{ datum }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_javascript %}
+
+{% endblock extra_javascript %}

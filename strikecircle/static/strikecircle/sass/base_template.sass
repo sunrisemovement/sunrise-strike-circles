@@ -4,6 +4,7 @@ html
   background-color: $light
   color: $dark
 
+
 .sunrise-button
   background-color: $light
   color: $dark
@@ -14,9 +15,25 @@ html
   cursor: pointer
   font-size: 14px
 
+  &.primary
+      background-color: $yellow
+      border: 2px solid $yellow
+      font-weight: bold
+
+      &:hover
+        color: $yellow
+
   &:hover
     background-color: $dark
     color: $light
+
+
+.page-title
+  text-align: center
+  max-width: 20rem
+  margin: 0 auto
+  padding-bottom: 3.5rem
+
 
 .navbar
   .navbar-brand, .navbar-menu, .navbar-end

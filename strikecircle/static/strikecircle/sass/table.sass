@@ -1,17 +1,21 @@
 @import "./base_template.sass"
     
-.listdisplay-container
-    .listdisplay-header, .listdisplay
+.table-container
+    overflow: hidden
+
+    .table-header, .table-body
         .column
             border-left: 1px solid white
             border-right: 1px solid white
 
-            &:first-child, &:last-child
+            &:first-child
                 border-left: 0
+
+            &:last-child
                 border-right: 0
 
 
-    .listdisplay-header
+    .table-header
         color: $yellow
         background-color: $dark
         padding: 0 15px
@@ -23,12 +27,12 @@
             flex-direction: row
             align-items: center
 
-    .listdisplay
+    .table-body
         padding: 0 15px
         background-color: #E1E1DA
 
         &:nth-child(even)
-            background-color: $light
+            background-color: $grey
 
         &:hover
             color: $yellow

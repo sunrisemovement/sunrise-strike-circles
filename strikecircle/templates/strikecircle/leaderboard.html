@@ -1,0 +1,26 @@
+{% load sass_tags sc_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'strikecircle/sass/table.sass' %}">
+<link rel="stylesheet" type="text/css" href="{% sass_src 'strikecircle/sass/leaderboard.sass' %}">
+{% endblock extra_css %}
+
+<div class="leaderboard-container table-container">
+    <div class="title is-6">{{ goal_name|capfirst }} {{ list_type }} </div>
+    <div class="table-header columns">
+        {% for header in data.header_row %}
+        <div class="column {{ data.col_classes|index:forloop.counter0 }}">
+            <p class="is-7">{{ header }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% for row in data.data %}
+    <div class="table-body columns">
+        {% for datum in row %}
+        <div class="column {{ data.col_classes|index:forloop.counter0 }}">
+            <p title="{{ datum }}" class="is-8">{{ datum }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
