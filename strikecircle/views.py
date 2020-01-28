@@ -75,6 +75,10 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
         with_progress = []
         for sc in objectified:
             strike_circle = strike_circles.get(id=sc['strike_circle'])
+
+            if strike_circle['goal'] == 0:
+                continue
+
             new_sc = [
                 strike_circle['name'],
                 strike_circle['goal'],
@@ -136,7 +140,23 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
 
 
 class DataInput(LoginRequiredMixin, TemplateView):
-    model = Pledge
+    model = Pledgeersions for date fields on input form
+Latest commitersions for date fields on input form
+Latest commit
+1f8f076
+8 hours ago
+Type 	Name 	Latest commit message 	Commit time
+	logs 	Moved LocationForm config to __init__(), small style changes 	2 months ago
+	media 	First commit 	3 months ago
+	static 	Renamed pledgetovote app to strikecircle 	2 days ago
+	strikecircle
+1f8f076
+8 hours ago
+Type 	Name 	Latest commit message 	Commit time
+	logs 	Moved LocationForm config to __init__(), small style changes 	2 months ago
+	media 	First commit 	3 months ago
+	static 	Renamed pledgetovote app to strikecircle 	2 days ago
+	strikecircle
     template_name = 'strikecircle/data_input_dashboard.html'
     context_object_name = 'pledges'
     paginate_by = 20
