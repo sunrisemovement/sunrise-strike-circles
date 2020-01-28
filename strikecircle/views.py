@@ -160,7 +160,8 @@ class DataInput(LoginRequiredMixin, TemplateView):
                 'header_row': ['First name', 'Last name', 'Email address', 'Phone number', 'Zipcode', 'Week pledged', 'One-on-one completed?'],
                 'fields': fields,
                 'col_classes': ['is-1', 'is-1', 'is-3', 'is-2', 'is-1', 'is-2', 'is-2']
-            }
+            },
+            'form': CreatePledge()
         })
 
         return context
