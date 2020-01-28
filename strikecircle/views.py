@@ -149,13 +149,19 @@ class DataInput(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         fields = ['first_name', 'last_name', 'email', 'phone', 'zipcode', 'date_collected', 'one_on_one']
+        hidden_fields = ['id']
+        qs = self.get_queryset()
 
         context.update({
             'table': {
-                'data': self.get_queryset().values_list(*fields),
+                'data': qs.values(*fields),
+                'hidden_data': qs.values(*hidden_fields),
                 'header_row': ['First name', 'Last name', 'Email address', 'Phone number', 'Zipcode', 'Week pledged', 'One-on-one completed?'],
                 'fields': fields,
-                'col_classes': ['is-1', 'is-1', 'is-3', 'is-2', 'is-1', 'is-2', 'is-2']
+                'col_classes': ['is-1', 'is-1', 'is-2', 'is-2', 'is-1', 'is-2', 'is-2']
+            },
+            'misc_data': {
+                'week_map': Pledge.DATA_COLLECTED_DATES
             }
         })
 
