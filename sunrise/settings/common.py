@@ -77,7 +77,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sunrise_strike_circles',
-        'USER': 'jesse',
+        'USER': env('POSTGRES_DB_NAME'),
         'PASSWORD': 'local',
         'HOST': 'localhost',
         'PORT': 5432

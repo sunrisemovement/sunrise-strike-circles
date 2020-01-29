@@ -31,6 +31,8 @@ I'm going to assume you're using Ubuntu, and are comfortable with the command li
 * From inside the repository directory, install Python packages with `pipenv install`.
 * Activate the project's virtual environment with `pipenv shell`.
 * Install the packages needed to compile Sass: `./manage.py bulma install`
+* Ensure [postgresql](https://www.postgresql.org/) is installed and the `POSTGRES_DB_NAME` is set to your local database name
+* Run `psql -c "CREATE DATABASE sunrise_strike_circles"` to initialize the project database
 * Run migrations with `./manage.py migrate`
 * Create a Django superuser with `./manage.py createsuperuser` (then follow the prompts)
 * Start the Django server: `./manage.py runserver`
