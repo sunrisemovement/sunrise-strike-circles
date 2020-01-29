@@ -13,7 +13,7 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
-from strikecircle.forms import CreatePledge, SignupForm, StrikeCircleCreateForm, StrikeCircleEditForm
+from strikecircle.forms import CreatePledgeFormSet, SignupForm, StrikeCircleCreateForm, StrikeCircleEditForm
 from strikecircle.models import Pledge, StrikeCircle
 
 
@@ -51,7 +51,11 @@ class Signup(CreateView):
         return super().get_context_data(**kwargs)
 
 
-class ProgressDashboard(LoginRequiredMixin, TemplateView):
+class SunriseLoginRequiredMixin(LoginRequiredMixin):
+    login_url = reverse_lazy('login')
+
+
+class ProgressDashboard(SunriseLoginRequiredMixin, TemplateView):
     template_name = 'strikecircle/progress_dashboard.html'
 
     @staticmethod
@@ -139,11 +143,27 @@ class ProgressDashboard(LoginRequiredMixin, TemplateView):
         return context
 
 
-class DataInput(LoginRequiredMixin, TemplateView):
+class DataInput(SunriseLoginRequiredMixin, TemplateView):
     model = Pledge
     template_name = 'strikecircle/data_input_dashboard.html'
     context_object_name = 'pledges'
     paginate_by = 20
+
+    def post(self, request, *args, **kwargs):
+        formset = CreatePledgeFormSet(request.POST)
+        sc = StrikeCircle.objects.get(user__id=request.user.id)
+        if formset.is_valid():
+            for form in formset:
+                if form.cleaned_data != {}:
+                    pledge = form.save(commit=False)
+                    pledge.strike_circle = sc
+                    pledge.save()
+
+            context = self.get_context_data(**kwargs)
+        else:
+            context = self.get_context_data(formset=formset, **kwargs)
+
+        return render(request, self.template_name, context=context)
 
     def get_queryset(self):
         sc = StrikeCircle.objects.get(user__id=self.request.user.id)
@@ -164,7 +184,7 @@ class DataInput(LoginRequiredMixin, TemplateView):
                 'fields': fields,
                 'col_classes': ['is-1', 'is-1', 'is-3', 'is-1', 'is-1', 'is-1', 'is-2', 'is-2']
             },
-            'form': CreatePledge(),
+            'formset': kwargs.get('formset', CreatePledgeFormSet(queryset=Pledge.objects.none())),
             'misc_data': {
                 'week_map': Pledge.DATA_COLLECTED_DATES
             }
@@ -173,127 +193,7 @@ class DataInput(LoginRequiredMixin, TemplateView):
         return context
 
 
-class DataEntry(LoginRequiredMixin, TemplateView):
-    template_name = 'strikecircle/data_entry_dashboard.html'
-
-    def post(self, request, *args, **kwargs):
-        add_one_on_ones = request.POST.get('add_one_on_ones')
-        checked_pledge_form = self._check_post_fields(['first_name', 'last_name', 'email', 'phone', 'yob', 'zipcode', 'date_collected'], request.POST)
-        checked_one_on_one_form = self._check_post_fields(['add_one_on_ones'], request.POST)
-        if checked_pledge_form:
-            cfpf = checked_pledge_form  # Just assigning a shorter variable name for brevity when creating Pledge below
-            pledge = Pledge(
-                first_name=cfpf['first_name'],
-                last_name=cfpf['last_name'],
-                email=cfpf['email'],
-                phone=cfpf['phone'],
-                yob=int(cfpf['yob']),
-                zipcode=cfpf['zipcode'],
-                date_collected=datetime.datetime.strptime(cfpf['date_collected'], '%Y-%m-%d').date(),
-                strike_circle=StrikeCircle.objects.get(user__id=self.request.user.id)
-                )
-            pledge.save()
-        elif checked_one_on_one_form:
-            de_stringed = list(map(int, checked_one_on_one_form['add_one_on_ones'].split(',')))
-            Pledge.objects.filter(id__in=de_stringed).update(one_on_one=datetime.date.today())
-
-        return HttpResponseRedirect("")
-
-    @staticmethod
-    # This method assumes that the headers, fields, and col_classes are in the same order
-    def get_listdisplay_data(qs, headers, fields, id=None, col_classes=[], hidden_fields=[]):
-        template_data = {'header_row': headers}
-        all_data = qs.values(*fields, *hidden_fields)
-
-        if col_classes:
-            template_data.update(col_classes=col_classes)
-
-        if id:
-            template_data.update(id=id)
-
-        if hidden_fields:
-            hidden_data = []
-            data = []
-
-            for datum in all_data:
-                hidden_row_data = {}
-                row_data = []
-
-                for key in datum.keys():
-                    # Hidden fields are stored as k/v pairs instead of in arrays, so that
-                    # in the template, they can be stored as data attributes with the same
-                    # name as the original field
-                    if key in hidden_fields:
-                        hidden_row_data[key] = datum[key]
-                    else:
-                        row_data.append(datum[key])
-
-                hidden_data.append(hidden_row_data)
-                data.append(row_data)
-
-            template_data.update({
-                'hidden_data': hidden_data,
-                'data': data
-            })
-        else:
-            template_data['data'] = all_data.values_list(*fields)
-
-        return template_data
-
-    def get_context_data(self, **kwargs):
-        sc = StrikeCircle.objects.get(user__id=self.request.user.id)
-
-        week_choices = Pledge.DATA_COLLECTED_DATES
-        formatted_choices = [(d.isoformat(), n) for d, n in week_choices]
-
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'pledge_text': Pledge.PLEDGES_TEMPLATE_NAME,
-            'one_on_one_text': Pledge.ONE_ON_ONES_TEMPLATE_NAME,
-
-            'week_choices': formatted_choices,
-            'pledge_form': CreatePledge(),
-            'pledges': self.get_listdisplay_data(
-                sc.pledge_set.all().order_by('-date_created'),
-                ['First', 'Last', 'Phone', 'Email', 'Zipcode'],
-                ['first_name', 'last_name', 'phone', 'email', 'zipcode'],
-                col_classes=['is-2', 'is-2', 'is-3', 'is-3', 'is-2']
-            ),
-            'no_one_on_one': self.get_listdisplay_data(
-                sc.pledge_set.filter(one_on_one__isnull=True).order_by('-date_created'),
-                ['First', 'Last'], ['first_name', 'last_name'],
-                id='no-one-on-one', hidden_fields=['id'], col_classes=['is-6', 'is-6']
-            ),
-            'selected_one_on_ones': self.get_listdisplay_data(
-                Pledge.objects.none(),
-                ['First', 'Last'], ['first_name', 'last_name'],
-                id='selected-one-on-ones', hidden_fields=['id'], col_classes=['is-6', 'is-6']
-            ),
-            'completed_one_on_ones': self.get_listdisplay_data(
-                sc.pledge_set.filter(one_on_one__isnull=False).order_by('-one_on_one'),
-                ['First', 'Last'], ['first_name', 'last_name'],
-                id='completed-one-on-ones', col_classes=['is-6', 'is-6']
-            )
-        })
-
-        return context
-
-    # Checks that each of the fields given is actually in the POST data. If it is, the key/value pair field:value is
-    # added to the dictionary that's returned. If any field is missing from the POST data, None is returned.
-    @staticmethod
-    def _check_post_fields(fields, post_data):
-        data = {}
-        for field in fields:
-            gotten = post_data.get(field)
-            if not gotten:
-                return None
-            else:
-                data[field] = gotten
-
-        return data
-
-
-class UpdateStrikeCircle(LoginRequiredMixin, UpdateView):
+class UpdateStrikeCircle(SunriseLoginRequiredMixin, UpdateView):
     model = StrikeCircle
     form_class = StrikeCircleEditForm
     template_name = 'strikecircle/sc_edit_form.html'
@@ -308,5 +208,5 @@ class UpdateStrikeCircle(LoginRequiredMixin, UpdateView):
         return sc
 
 
-class ProgramGuide(LoginRequiredMixin, TemplateView):
+class ProgramGuide(SunriseLoginRequiredMixin, TemplateView):
     template_name = 'strikecircle/program_guide.html'

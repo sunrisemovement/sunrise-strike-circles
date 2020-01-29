@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 
 from strikecircle.models import Pledge, StrikeCircle
 
@@ -75,9 +76,5 @@ class CreatePledge(forms.ModelForm):
     class Meta:
         model = Pledge
         fields = ['first_name', 'last_name', 'email', 'phone', 'zipcode', 'yob', 'date_collected', 'one_on_one']
-        labels = {
-            'yob': "Year of birth"
-        }
-        widgets = {
-            'one_on_one': forms.CheckboxInput
-        }
+
+CreatePledgeFormSet = forms.modelformset_factory(Pledge, extra=0, form=CreatePledge)

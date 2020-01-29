@@ -20,13 +20,15 @@
         </div>
         <div class="level-left mode-add">
             <p class="instructions">Fill in the new line to add a new pledge.</p>
-            <p class="instructions">Hit enter when you're done to add another pledge.</p>
+            <p class="instructions">Click "Add another" when you're done to add another pledge.</p>
+            <p class="instructions">When you're done entering pledges, click "Submit Pledges" to save your work!</p>
         </div>
         <div class="level-right mode-add">
-            <div class="sunrise-button primary" id="done-adding-button">Done Adding</div>
+            <span class="sunrise-button" id="add-another-button">Add another</span>
+            <span class="sunrise-button" id="cancel-adding-button">Cancel Adding</span>
         </div>
         <div class="level-right mode-add">
-            <div class="sunrise-button" id="cancel-adding-button">Cancel Adding</div>
+            <div class="sunrise-button primary" id="submit-pledges-button">Submit Pledges</div>
         </div>
     </div>
     {{ misc_data.week_map|json_script:"week-map" }}
@@ -38,20 +40,35 @@
             </div>
             {% endfor %}
         </div>
-        <form method="post">
-            <div class="input-table-add table-row columns" id="table-input-row">
-            {% for field in form %}
-            <div class="column input-column {{ table.col_classes|index:forloop.counter0 }}">
-                {% if field|is_select %}
-                <div class="select-wrapper">{{ field }}</div>
-                {% else %}
-                {{ field }}
-                {% endif %}
-            </div>
+        <div class="input-table-add-container">
+            <!-- An empty copy of the form to copy when adding new forms to the formset. We only want the visible
+            fields, because the hidden_fields contains a hidden ID input, which is only needed if you're editing
+            existing objects. Since we're only creating new items here, we'd cause an error by submitting the formset
+            with hidden, empty ID fields. -->
+            <div class="input-table-added-row table-row columns hidden" id="empty-clone">
+            {% for field in formset.empty_form.visible_fields %}
+                <div class="column input-column {{ table.col_classes|index:forloop.counter0 }}">
+                    {% if field|is_select %}
+                    <div class="select-wrapper">{{ field }}</div>
+                    {% elif field.name == "one_on_one" %}
+                    <div class="bool-date-wrapper">
+                        {{ field|addclass:"hidden" }}
+                        <input type="checkbox"><span class="checkmark fas fa-check">
+                    </div>
+                    {% else %}
+                    {{ field }}
+                    {% endif %}
+                </div>
             {% endfor %}
             {% csrf_token %}
             </div>
-        </form>
+
+            <form id="add-pledges-form" method="post">
+            {{ formset.management_form }}
+            {% csrf_token %}
+            </form>
+        </div>
+        <span id="hidden-check" class="hidden fas fa-check"></span>
         {% for row in table.data %}
         <div class="table-row columns"
         {% if table.hidden_data %}
