@@ -171,8 +171,6 @@ LOGGING = {
     }
 }
 
-SITE_URL = env('SITE_URL')
-
 DATE_FORMAT = 'Y-m-d'
 
 # SASS settings
