@@ -6,7 +6,7 @@ register = template.Library()
 def index(value, arg):
     try:
         val = value[arg]
-    except KeyError:
+    except (IndexError, KeyError):
         val = None
 
     return val
