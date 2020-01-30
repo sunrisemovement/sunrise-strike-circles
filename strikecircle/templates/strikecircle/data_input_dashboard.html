@@ -32,61 +32,60 @@
         </div>
     </div>
     {{ misc_data.week_map|json_script:"week-map" }}
-    <div class="input-table table-container">
-        <div class="input-table-header table-header columns">
-            {% for header in table.header_row %}
-            <div class="column {{ table.col_classes|index:forloop.counter0 }}">
-                <p class="is-7">{{ header }}</p>
-            </div>
-            {% endfor %}
-        </div>
-        <div class="input-table-add-container">
-            <!-- An empty copy of the form to copy when adding new forms to the formset. We only want the visible
-            fields, because the hidden_fields contains a hidden ID input, which is only needed if you're editing
-            existing objects. Since we're only creating new items here, we'd cause an error by submitting the formset
-            with hidden, empty ID fields. -->
-            <div class="input-table-added-row table-row columns hidden" id="empty-clone">
-            {% for field in formset.empty_form.visible_fields %}
-                <div class="column input-column {{ table.col_classes|index:forloop.counter0 }}">
-                    {% if field|is_select %}
-                    <div class="select-wrapper">{{ field }}</div>
-                    {% elif field.name == "one_on_one" %}
-                    <div class="bool-date-wrapper">
-                        {{ field|addclass:"hidden" }}
-                        <input type="checkbox"><span class="checkmark fas fa-check">
-                    </div>
-                    {% else %}
-                    {{ field }}
-                    {% endif %}
-                </div>
-            {% endfor %}
-            {% csrf_token %}
-            </div>
-
-            <form id="add-pledges-form" method="post">
-            {{ formset.management_form }}
-            {% csrf_token %}
-            </form>
-        </div>
-        <span id="hidden-check" class="hidden fas fa-check"></span>
-        {% for row in table.data %}
-        <div class="table-row columns"
-        {% if table.hidden_data %}
-        {% with table.hidden_data|index:forloop.counter0 as hidden_row_data %}
-        {% for key, val in hidden_row_data.items %}
-            data-{{ key }}="{{ val }}"
-        {% endfor %}
-        {% endwith %}
-        {% endif %}
-        >
-            {% for key, val in row.items %}
-            <div class="column {{ table.col_classes|index:forloop.counter0 }}">
-                <p data-field="{{ key }}" data-value="{{ val }}" class="is-8">{{ val }}</p>
-            </div>
-            {% endfor %}
+    <div class="input-table-header table-header columns">
+        {% for header in table.header_row %}
+        <div class="column {{ table.col_classes|index:forloop.counter0 }}">
+            <p class="is-7">{{ header }}</p>
         </div>
         {% endfor %}
     </div>
+    <div class="input-table-add-container">
+        <!-- An empty copy of the form to copy when adding new forms to the formset. We only want the visible
+        fields, because the hidden_fields contains a hidden ID input, which is only needed if you're editing
+        existing objects. Since we're only creating new items here, we'd cause an error by submitting the formset
+        with hidden, empty ID fields. -->
+        <div data-form-num="__prefix__" class="input-table-added-row table-row columns hidden" id="empty-clone">
+        {% for field in formset.empty_form.visible_fields %}
+            <div class="column input-column {{ table.col_classes|index:forloop.counter0 }}">
+                {% if field|is_select %}
+                <div class="select-wrapper">{{ field }}</div>
+                {% elif field.name == "one_on_one" %}
+                <div class="bool-date-wrapper">
+                    {{ field|addclass:"hidden" }}
+                    <input type="checkbox"><span class="checkmark fas fa-check">
+                </div>
+                {% else %}
+                {{ field }}
+                {% endif %}
+            </div>
+        {% endfor %}
+        <i class="fas fa-times del-row"></i>
+        {% csrf_token %}
+        </div>
+        <input type="hidden" name="form-__prefix__-DELETE" id="delete-template">
+        <form id="add-pledges-form" method="post">
+        {{ formset.management_form }}
+        {% csrf_token %}
+        </form>
+    </div>
+
+    {% for row in table.data %}
+    <div class="table-row columns"
+    {% if table.hidden_data %}
+    {% with table.hidden_data|index:forloop.counter0 as hidden_row_data %}
+    {% for key, val in hidden_row_data.items %}
+        data-{{ key }}="{{ val }}"
+    {% endfor %}
+    {% endwith %}
+    {% endif %}
+    >
+        {% for key, val in row.items %}
+        <div class="column {{ table.col_classes|index:forloop.counter0 }}">
+            <p data-field="{{ key }}" data-value="{{ val }}" class="is-8">{{ val }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
 </div>
 {% endblock content %}
 

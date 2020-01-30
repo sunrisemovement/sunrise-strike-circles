@@ -7,21 +7,25 @@ $(document).ready(function() {
         }
     };
 
-    const addModeToggle = () => {
-        let rowsToToggle = $('.input-table-added-row').not('.hidden');
-        // If there aren't any empty form rows, add one and refresh the rowsToToggle selector
-        if (rowsToToggle.length == 0) {
-            addForm();
-            rowsToToggle = $(rowsToToggle.selector);
+    const addModeToggle = turnOn => {
+        return () => {
+            let rowsToToggle = $('.input-table-added-row').not('.hidden');
+            // If add mode was toggled on and there aren't any empty form rows, add one and refresh
+            // the rowsToToggle selector
+            if (turnOn && rowsToToggle.length == 0) {
+                addForm();
+                rowsToToggle = $(rowsToToggle.selector);
+            }
+
+            // Change the visibility of the form rows
+            const newDisplayStyle = turnOn ? 'flex' : 'none';
+            $(rowsToToggle).each(function() {
+                $(this).css('display', newDisplayStyle);
+            });
+            $('.mode-add').toggle();
+            $('.mode-default').toggle();
         }
 
-        // Change the visibility of the form rows
-        const newDisplayStyle = $(rowsToToggle[0]).css('display') == 'flex' ? 'none' : 'flex';
-        $(rowsToToggle).each(function() {
-            $(this).css('display', newDisplayStyle);
-        });
-        $('.mode-add').toggle();
-        $('.mode-default').toggle();
     };
 
     // Add another form to the formset
@@ -29,7 +33,7 @@ $(document).ready(function() {
         const numForms = parseInt($('#id_form-TOTAL_FORMS').val());
         $('#id_form-TOTAL_FORMS').val(numForms + 1);
         let clone = $('#empty-clone').clone().removeAttr('id').removeClass('hidden');
-        $(clone).find('input, select').each(function() {
+        $(clone).find('input, select').addBack('.input-table-added-row').each(function() {
             const el = $(this);
             // Iterate over every attribute of the current element, and replace '__prefix__' in any attribute value
             // with the current number of input form rows (0-indexed)
@@ -44,19 +48,30 @@ $(document).ready(function() {
         $('#add-pledges-form').append(clone);
     };
 
-    // Submit the formset
-    const submitFormset = () => {
-        $('#add-pledges-form').submit();
-    };
-
     const weekMap = JSON.parse($('#week-map').text());  // Array of arrays, pairing dates with week names
     const checkmark = $('#hidden-check').clone().removeAttr('id', 'aria-hidden').removeClass('hidden');
 
     // Button triggers for adding new pledges
-    $('#add-pledges-button').click(addModeToggle);
-    $('#cancel-adding-button').click(addModeToggle);
-    $('#submit-pledges-button').click(submitFormset);
+    $('#add-pledges-button').click(addModeToggle(true));
+    $('#cancel-adding-button').click(addModeToggle(false));
+    $('#submit-pledges-button').click(() => {
+        $('#add-pledges-form').submit();
+    });
     $('#add-another-button').click(addForm);
+    // Make it possible to delete input rows
+    $('#add-pledges-form').on('click', '.del-row', function() {
+        // By adding the "hidden" class to the row, we make sure that it doesn't get re-displayed if the user deletes
+        // the row, hits the cancel button, and then re-enters add mode. addModeToggle() ignores rows with the class "hidden".
+        $(this).parent().addClass('hidden');
+
+        // Django formsets require a hidden field to be added when a form in the formset is to be deleted/not processed.
+        // See https://docs.djangoproject.com/en/3.0/topics/forms/formsets/#understanding-the-managementform
+        const delTemplate = $('#delete-template');
+        const deleteInputName = $(delTemplate).attr('name').replace('__prefix__', $(this).parent().data('formNum'));
+        const deleteInput = $(delTemplate).attr('name', deleteInputName);
+        $('#add-pledges-form').append(deleteInput);
+    });
+
 
     // Replace the date_collected field of each pledge with the week corresponding to date_collected
     $('p[data-field="date_collected"]').each(function(_, el) {

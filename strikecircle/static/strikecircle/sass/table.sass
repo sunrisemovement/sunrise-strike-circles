@@ -1,45 +1,42 @@
 @import "./base_template.sass"
     
-.table-container
-    overflow: hidden
+.table-header, .table-row
+    .column
+        border-left: 1px solid white
+        border-right: 1px solid white
 
-    .table-header, .table-row
-        .column
-            border-left: 1px solid white
-            border-right: 1px solid white
+        &:first-of-type
+            border-left: 0
 
-            &:first-of-type
-                border-left: 0
-
-            &:last-of-type
-                border-right: 0
+        &:last-of-type
+            border-right: 0
 
 
-    .table-header
+.table-header
+    color: $yellow
+    background-color: $dark
+    padding: 0 15px
+    border-bottom: 2px solid white;
+
+    .column
+        white-space: normal
+        display: flex
+        flex-direction: row
+        align-items: center
+
+.table-row
+    padding: 0 15px
+    background-color: $light-grey
+
+    &:nth-child(even)
+        background-color: $grey
+
+    &:hover
         color: $yellow
         background-color: $dark
-        padding: 0 15px
-        border-bottom: 2px solid white;
 
-        .column
-            white-space: normal
-            display: flex
-            flex-direction: row
-            align-items: center
-
-    .table-row
-        padding: 0 15px
-        background-color: $light-grey
-
-        &:nth-child(even)
-            background-color: $grey
-
-        &:hover
-            color: $yellow
-            background-color: $dark
-
-        .column p
-            text-overflow: ellipsis
-            white-space: nowrap
-            overflow: hidden
-            font-size: 12px
+    .column p
+        text-overflow: ellipsis
+        white-space: nowrap
+        overflow: hidden
+        font-size: 12px
