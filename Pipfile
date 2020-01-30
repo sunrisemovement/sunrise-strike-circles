@@ -18,6 +18,7 @@ libsass = "*"
 django-sass-processor = "*"
 django-bulma = "*"
 psycopg2 = "*"
+django-compressor = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,0 +1,13 @@
+#!/bin/bash -l
+
+GIT_REPO=$HOME/sunrise-strike-circles.git
+NGINX_SITE_ROOT=$HOME/sunrise-strike-circles
+
+git clone -l $GIT_REPO $NGINX_SITE_ROOT
+cd $NGINX_SITE_ROOT
+PIPENV_VENV_IN_PROJECT=1 pipenv install
+pipenv run ./manage.py migrate
+pipenv run ./manage.py bulma install
+pipenv run ./manage.py compilescss
+pipenv run ./manage.py collectstatic --no-input --ignore=*.sass
+exit
