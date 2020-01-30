@@ -50,16 +50,36 @@ Many of these instructions overlap with the local deploy process.
 * Log into [Digital Ocean](https://digitalocean.com). (If you're using the sunrise DO account, ask Andrew Jones for credentials.)
 * Create a new Ubuntu 18.04 droplet. The smallest/cheapest option should be fine (1GB RAM, 25GB storage). When you're creating it, there should be an option to add an SSH key -- add yours. This will allow you to SSH into the droplet once it has been created.
 * Once you have a droplet, follow the steps in Digital Ocean's [initial server setup guide](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04).
-* Install system-level dependencies: `sudo apt install curl python3 python3-dev python3-pip python3.7 nginx nodejs npm`
+* Install system-level dependencies: `sudo apt install curl python3 python3-dev python3-pip python3.7-dev nginx nodejs npm`
 * Install Pipenv: `pip3 install --user pipenv`
 * Add Pipenv to the path, by adding this line to `~/.bashrc` (or `~/.zshrc`, if you use `zsh`): `export PATH="$HOME/.local/bin/:$PATH"`
-* Clone this repository and change directory into it: `git clone https://github.com/jlevers/sunrise-pledge-to-vote && cd sunrise-pledge-to-vote`
-* Copy `.env.example` to `.env`, and fill in the variables in it. You can generate a secret key with [Djecrety](https://djecrety.ir/), and `SITE_URL` should be set to the IP address of your droplet.
-* Then, from inside the repository directory, install Python packages with `export PIPENV_VENV_IN_PROJECT="enabled" && pipenv install`. Setting the `PIPENV_VENV_IN_PROJECT` environment variable forces Pipenv to create the virtual environment for the project inside the project directory (in this case the virtual environment will be stored in `~/sunrise-pledge-to-vote/.venv/`).
-* Activate the project's virtual environment with `pipenv shell`.
-* Install the packages needed to compile Sass: `./manage.py bulma install`
-* Run migrations with `./manage.py migrate`
+* Do a bare clone this repository and change directory into it: `git clone --bare https://github.com/sunrisemovement/sunrise-strike-circles && cd sunrise-strike-circles.git/`
+* Copy `.env.example` to `.env`, and fill in the variables in it. You can generate a secret key with [Djecrety](https://djecrety.ir/), and `SITE_URLS` should be set to a comma-separated list of all domains you might be accessing the project from. When I set it up, the list was `localhost,strikecircle.sunrisemovement.org,<droplet ipv4 address>,<droplet ipv6 address>`, but yours may be different.
+* Add the following to the end of your `~/.bashrc`:
+```bash
+# Adds the settings files to Python's include path.
+export PYTHONPATH=$HOME/sunrise-strike-circles/sunrise/settings/:$PYTHONPATH
+# Tell Django which settings file to use. The value this is set to MUST be on the $PYTHONPATH.
+# See https://docs.djangoproject.com/en/3.0/topics/settings/#envvar-DJANGO_SETTINGS_MODULE for details.
+export DJANGO_SETTINGS_MODULE=sunrise.settings.production
+```
+* In the bare repository you cloned to, create the file `hooks/post-receive` and add the contents of `.githooks/post-receive` to it. You'll have to copy `.githooks/post-receive` from a regular repository, not a bare one -- your local repo will work just fine. Once you've created `hooks/post-receive`, make it executable with `chmod +x hooks/post-receive`.
+* In your local repository, add your bare repository as a remote (in this case, I'm naming the remote `deploy`): `git remote add deploy ubuntu@<server-ip>:~/sunrise-strike-circles.git`
 * Create a Django superuser with `./manage.py createsuperuser` (then follow the prompts)
-* Add your site's IP address to the `ALLOWED_HOSTS` list in `sunrise/settings/production.py`.
-* Collect all static files so that they can be served by Nginx: `./manage.py collectstatic`
 * Then, follow Digital Ocean's [guide for deploying a Django app](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04) using Gunicorn, starting where they tell you to "create an exception for port 8000". They use a lot of placeholder names -- don't forget to replace them all with their actual values in this app! For instance, replace `myproject` with `sunrise`, `sammy` with the name of the user you created in the initial setup guide, etc.
+* Open up the nginx site configuration that you created in the last step (probably a file like `/etc/nginx/sites-available/sunrise-strike-circles`, or something like that). Add the following, inside the `server` block:
+```
+...
+
+location /static/ {
+    # This redirects all requests to /static/ to /collected_statics/
+    rewrite ^/static/(.*)$ /collected_statics/$1 last;
+}
+
+location /collected_statics/ {
+    # Look in /home/ubuntu/sunrise-strike-circles/ for the collected_statics directory
+    root /home/ubuntu/sunrise-strike-circles/;
+}
+...
+```
+* When you're done with all that, you should be able to make changes to the production server by pushing from your local `master` like so: `git push deploy`. You're all set!
