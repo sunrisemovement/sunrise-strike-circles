@@ -1,4 +1,5 @@
 {% extends 'base_template.html' %}
+{% load static %}
 {% load sass_tags %}
 
 {% block subtitle %}Program Guide{% endblock subtitle %}
@@ -8,5 +9,5 @@
 {% endblock extra_css %}
 
 {% block content %}
-<iframe src="https://docs.google.com/document/d/e/2PACX-1vStqVRy4RpKIjk_GJsMAFGXmuRQbkAh1PcYc4Hvj5wZucSgHqIIaXFSauQsd9yAQMdweajLWp4NwTDn/pub?embedded=true"></iframe>
+<iframe src="{% static 'strikecircle/program.pdf' %}" style="width:800px; height:800px;" frameborder="0"></iframe>
 {% endblock content %}
