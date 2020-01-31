@@ -1,4 +1,25 @@
 $(document).ready(function() {
+    const setCookie = (cname, cvalue, exdays) => {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires="+ d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    const getCookie = (cname) => {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ')
+              c = c.substring(1);
+            if (c.indexOf(name) == 0)
+              return c.substring(name.length, c.length);
+        }
+        return "";
+    }
+
     const dateToWeek = date => {
         for (let dateTuple of weekMap) {
             if (dateTuple[0] == date) {
@@ -46,6 +67,18 @@ $(document).ready(function() {
         });
         $(clone).css('display', 'flex');
         $('#add-pledges-form').append(clone);
+
+
+        // Set the week to the most recently selected value (& save to cookie)
+        const $weekSelect = $(clone).find('[data-field="date_collected"] select');
+        const weekCname = 'sunrise-strike-circle-week';
+        if (getCookie(weekCname)) {
+            $weekSelect.val(getCookie(weekCname));
+        }
+        $weekSelect.change((ev) => {
+            const weekVal = $(ev.currentTarget).val();
+            setCookie(weekCname, weekVal, 7); // save cookie for 7 days
+        });
     };
 
     const weekMap = JSON.parse($('#week-map').text());  // Array of arrays, pairing dates with week names
