@@ -86,7 +86,40 @@
         {% endfor %}
     </div>
     {% endfor %}
+
+	{% if page_obj.paginator.num_pages > 1 %}
+		<nav class="pagination is-rounded" role="navigation" aria-label="pagination">
+			<ul class="pagination-list">
+				{% if page_obj.previous_page_number > 1 %}
+					<li><a class="pagination-link" href="?page=1">1</a></li>
+				{% endif %}
+
+				{% if ellipsis_start %}
+					<li><span class="pagination-ellipsis">&hellip;</span></li>
+				{% endif %}
+
+				{% if page_obj.has_previous %}
+					<li><a class="pagination-link" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
+				{% endif %}
+
+				<li><a class="pagination-link is-current">{{ page_obj.number }}</a></li>
+
+				{% if page_obj.has_next %}
+					<li><a class='pagination-link' href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
+				{% endif %}
+
+				{% if ellipsis_end %}
+					<li><span class="pagination-ellipsis">&hellip;</span></li>
+				{% endif %}
+
+				{% if page_obj.next_page_number < page_obj.paginator.num_pages %}
+					<li><a class='pagination-link' href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
+				{% endif %}
+			</ul>
+		</nav>
+	{% endif %}
 </div>
+
 {% endblock content %}
 
 {% block extra_javascript %}
