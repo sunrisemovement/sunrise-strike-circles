@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.db.models import Count, F, Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -147,7 +148,6 @@ class DataInput(SunriseLoginRequiredMixin, TemplateView):
     model = Pledge
     template_name = 'strikecircle/data_input_dashboard.html'
     context_object_name = 'pledges'
-    paginate_by = 20
 
     def post(self, request, *args, **kwargs):
         formset = CreatePledgeFormSet(request.POST)
@@ -174,9 +174,15 @@ class DataInput(SunriseLoginRequiredMixin, TemplateView):
 
         fields = ['first_name', 'last_name', 'email', 'phone', 'zipcode', 'yob', 'date_collected', 'one_on_one']
         hidden_fields = ['id']
-        qs = self.get_queryset()
+        paginator = Paginator(self.get_queryset(), 20)
+        page_num = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_num)
+        qs = page_obj.object_list
 
         context.update({
+	    'page_obj': page_obj,
+	    'ellipsis_start': page_obj.number > 3,
+	    'ellipsis_end': page_obj.number < paginator.num_pages - 2,
             'table': {
                 'data': qs.values(*fields),
                 'hidden_data': qs.values(*hidden_fields),
