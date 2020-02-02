@@ -3,16 +3,22 @@
 GIT_REPO=$HOME/sunrise-strike-circles.git
 NGINX_SITE_ROOT=$HOME/sunrise-strike-circles
 
-if [ -d "$NGINX_SITE_ROOT" ]; then
-	cd $NGINX_SITE_ROOT
-	git fetch origin
-else
-	git clone -l $GIT_REPO $NGINX_SITE_ROOT
-	cd $NGINX_SITE_ROOT
+if [ ! -d "$NGINX_SITE_ROOT" ]; then
+	mkdir $NGINX_SITE_ROOT
 fi
+
+unset GIT_INDEX_FILE
+git --git-dir=$GIT_REPO --work-tree=$NGINX_SITE_ROOT checkout -f
+
+cd $NGINX_SITE_ROOT
+
+export PYTHON_PATH=$HOME/sunrise-strike-circles/sunrise/settings/:$PYTHON_PATH
+export DJANGO_SETTINGS_MODULE=sunrise.settings.production
+
 PIPENV_VENV_IN_PROJECT=1 pipenv install
 pipenv run ./manage.py migrate
 pipenv run ./manage.py bulma install
+pipenv run ./manage.py bulma build
 pipenv run ./manage.py compilescss
 pipenv run ./manage.py collectstatic --no-input --ignore=*.sass
 exit
