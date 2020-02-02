@@ -6,11 +6,11 @@ $(document).ready(function() {
         document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
 
-    const getCookie = (cname) => {
+    const getCookie = cname => {
         var name = cname + "=";
         var decodedCookie = decodeURIComponent(document.cookie);
         var ca = decodedCookie.split(';');
-        for(var i = 0; i <ca.length; i++) {
+        for(var i = 0; i < ca.length; i++) {
             var c = ca[i];
             while (c.charAt(0) == ' ')
               c = c.substring(1);
@@ -68,14 +68,13 @@ $(document).ready(function() {
         $(clone).css('display', 'flex');
         $('#add-pledges-form').append(clone);
 
-
         // Set the week to the most recently selected value (& save to cookie)
         const $weekSelect = $(clone).find('[data-field="date_collected"] select');
         const weekCname = 'sunrise-strike-circle-week';
         if (getCookie(weekCname)) {
             $weekSelect.val(getCookie(weekCname));
         }
-        $weekSelect.change((ev) => {
+        $weekSelect.change(ev => {
             const weekVal = $(ev.currentTarget).val();
             setCookie(weekCname, weekVal, 7); // save cookie for 7 days
         });
