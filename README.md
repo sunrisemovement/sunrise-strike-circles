@@ -40,6 +40,11 @@ I'm going to assume you're using Ubuntu, and are comfortable with the command li
 
 Go to `localhost:8000`, and you should be able to see the site! To access the admin site, go to `localhost:8000/admin`, and enter the credentials you specified when you created a superuser.
 
+#### Troubleshooting
+
+##### `An error occurred while installing psycopg2==2.8.4`
+Possible cuase: `fatal error: Python.h: No such file or directory`. If so, install the dev version of python: `sudo apt-get install python3.7-dev`
+
 
 ### Deploying to a Digital Ocean server
 
