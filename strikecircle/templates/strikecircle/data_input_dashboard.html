@@ -46,7 +46,7 @@
         with hidden, empty ID fields. -->
         <div data-form-num="__prefix__" class="input-table-added-row table-row columns hidden" id="empty-clone">
         {% for field in formset.empty_form.visible_fields %}
-            <div class="column input-column {{ table.col_classes|index:forloop.counter0 }}">
+            <div class="column input-column {{ table.col_classes|index:forloop.counter0 }}" data-field="{{ field.name }}">
                 {% if field|is_select %}
                 <div class="select-wrapper">{{ field }}</div>
                 {% elif field.name == "one_on_one" %}
