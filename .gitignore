@@ -6,3 +6,4 @@ collected_statics/*
 .env
 *.sqlite3
 .vscode
+strikecircle/static/**/sass/*.css
