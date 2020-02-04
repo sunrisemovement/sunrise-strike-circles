@@ -67,7 +67,7 @@ const drawGraphs = () => {
                         },
                         ticks: {
                             min: 0,
-                            max: Math.ceil(goal * 1.15),
+                            max: Math.max(Math.ceil(goal * 1.15), parsedData[parsedData.length - 1] * 1.15),
                             callback: value => value > 0 ? `Goal: ${value} ${goalType}` : ''
                         },
                         afterBuildTicks: axis => {
