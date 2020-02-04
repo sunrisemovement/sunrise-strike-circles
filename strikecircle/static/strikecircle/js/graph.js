@@ -27,6 +27,7 @@ const drawGraphs = () => {
             }
         }
         const parsedData = data.slice(0, i + 2);
+        const maxVal = parsedData[parsedData.length - 1];
 
         new Chart(ctx, {
             type: 'line',
@@ -67,11 +68,11 @@ const drawGraphs = () => {
                         },
                         ticks: {
                             min: 0,
-                            max: Math.ceil(goal * 1.15),
-                            callback: value => value > 0 ? `Goal: ${value} ${goalType}` : ''
+                            max: Math.max(Math.ceil(goal * 1.15), maxVal * 1.15),
+                            callback: value => (value == goal ? 'Goal: ' : '') + `${value} ${goalType}`
                         },
                         afterBuildTicks: axis => {
-                            axis.ticks = [0, goal];
+                            axis.ticks = [0, goal, maxVal];
                         }
                     }]
                 }
