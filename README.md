@@ -1,21 +1,17 @@
-Pledge to Vote
+Strike Circles
 --------------
 
-This is the Sunrise Movement's Pledge to Vote website. It allows hub organizers (or anyone else with access) to collect information from people who want to pledge to vote at the next election. It also tags each "pledge" with the location where that pledge was entered.
-
-It will eventually push all this data to EveryAction, but that has yet to be implemented.
+This is the Sunrise Movement's Strike Circles website. It allows Strike Circle organizers (or anyone else with access) to input, edit, and visualize data about people who've pledged to vote both for their own hub, and for all hubs across the entire movement.
 
 ## Usage
-The main portion of the site is protected by a site-wide password. There isn't a user login system, but anyone visiting the site has to enter a password before they can enter any data. When the site is first set up, the active password is `sunrise`. Anyone with admin access (more on that later) can add/remove passwords, and mark certain passwords as active. This allows for different events to use different passwords, even if they're using the site at the same time.
 
-Once logged in, there are a few main views.
-* The homepage shows the list of pledges, in descending chronological order.
-* Clicking on any of the pledges shown on the homepage brings you to a form where you can edit that pledge.
-* Clicking the New Pledge header link brings you to a form where you can enter a new link.
-* Clicking the Set Location header link brings you to a form where you can specify your current location (i.e., where you're entering pledges from). You can either choose a pre-existing location, or create a new one. Once you set your location, it will be saved for 24 hours, after which you'll have to re-enter it. This location is associated with each pledge that you submit. (If your location is not set/was set more than 24 hours ago, you'll be redirected to the Set Location page when you try to create a new pledge.)
+Each user must have an associated Strike Circle. This is automatically dealt with when a new account is created via the Signup page, because the user signup and Strike Circle creation forms have been combined into a single form.
 
-To create new passwords or disable old passwords, and for more granular editing of the different parts of the system, go to `/admin/`. You have to be a superuser to log in here -- you can create a new superuser with `./manage.py createsuperuser`. I'll talk about that in more detail in the installation/setup instructions below.
+Once they have an account, a Strike Circle can set their goals for the number of pledges that they intend to get, and the number of one-on-ones they plan on doing. The main data dashboard page shows them their progress towards those goals, as well as the cumulative progress of all Strike Circles in the movement towards their total goal. There's also a leaderboard showing the top 5 Strike Circles, as judged by how close they are to reaching their goals.
 
+There's also a data input page, where Strike Circles can input new pledges, edit existing pledges, and mark pledges as having had one-on-ones.
+
+The last major page, the Program Guide page, just contains an embedded PDF of the Strike Circle organizing document.
 
 ## Installation and Setup
 
@@ -60,14 +56,6 @@ Many of these instructions overlap with the local deploy process.
 * Add Pipenv to the path, by adding this line to `~/.bashrc` (or `~/.zshrc`, if you use `zsh`): `export PATH="$HOME/.local/bin/:$PATH"`
 * Do a bare clone this repository and change directory into it: `git clone --bare https://github.com/sunrisemovement/sunrise-strike-circles && cd sunrise-strike-circles.git/`
 * Copy `.env.example` to `.env`, and fill in the variables in it. You can generate a secret key with [Djecrety](https://djecrety.ir/), and `SITE_URLS` should be set to a comma-separated list of all domains you might be accessing the project from. When I set it up, the list was `localhost,strikecircle.sunrisemovement.org,<droplet ipv4 address>,<droplet ipv6 address>`, but yours may be different.
-* Add the following to the end of your `~/.bashrc`:
-```bash
-# Adds the settings files to Python's include path.
-export PYTHONPATH=$HOME/sunrise-strike-circles/sunrise/settings/:$PYTHONPATH
-# Tell Django which settings file to use. The value this is set to MUST be on the $PYTHONPATH.
-# See https://docs.djangoproject.com/en/3.0/topics/settings/#envvar-DJANGO_SETTINGS_MODULE for details.
-export DJANGO_SETTINGS_MODULE=sunrise.settings.production
-```
 * In the bare repository you cloned to, create the file `hooks/post-receive` and add the contents of `.githooks/post-receive` to it. You'll have to copy `.githooks/post-receive` from a regular repository, not a bare one -- your local repo will work just fine. Once you've created `hooks/post-receive`, make it executable with `chmod +x hooks/post-receive`.
 * In your local repository, add your bare repository as a remote (in this case, I'm naming the remote `deploy`): `git remote add deploy ubuntu@<server-ip>:~/sunrise-strike-circles.git`
 * Create a Django superuser with `./manage.py createsuperuser` (then follow the prompts)
