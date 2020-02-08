@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    /********************/
+    /** Misc functions **/
+
     const setCookie = (cname, cvalue, exdays) => {
         var d = new Date();
         d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -28,6 +31,10 @@ $(document).ready(function() {
         }
     };
 
+    /** End misc functions **/
+    /************************/
+
+
     /**********************/
     /** Common selectors/other strings **/
 
@@ -40,6 +47,11 @@ $(document).ready(function() {
     /** End common selectors/strings **/
     /**************************/
 
+
+    /*******************************/
+    /** Related to adding pledges **/
+
+    // Toggles between add mode and view mode
     const addModeToggle = turnOn => {
         return () => {
             let $rowsToToggle = $(_inputTableRow).not(`.${_hiddenClass}`);
@@ -58,7 +70,6 @@ $(document).ready(function() {
             $('.mode-add').toggle();
             $('.mode-default').toggle();
         }
-
     };
 
     // Add another form to the formset
@@ -93,10 +104,7 @@ $(document).ready(function() {
         });
     };
 
-    const weekMap = JSON.parse($('#week-map').text());  // Array of arrays, pairing dates with week names
-    const checkmark = $('#hidden-check').clone().removeAttr('id', 'aria-hidden').removeClass('hidden');
-
-    // Button triggers for adding new pledges
+    // Button actions for adding new pledges
     $('#add-pledges-button').click(addModeToggle(true));
     $('#cancel-adding-button').click(addModeToggle(false));
     $('#submit-pledges-button').click(() => {
@@ -104,6 +112,12 @@ $(document).ready(function() {
     });
     $('#add-another-button').click(addForm);
 
+    /** End code related to adding new pledges **/
+    /********************************************/
+
+
+    /*****************************************/
+    /** Related to editing existing pledges **/
 
     // Toggles between edit mode and view mode
     const editModeToggle = () => {
@@ -143,6 +157,12 @@ $(document).ready(function() {
         $('#edit-pledges-form').submit();
     });
 
+    /** End code related to editing existing pledges **/
+    /**************************************************/
+
+
+    /** Related to both adding and editing pledges **/
+    /************************************************/
 
     // Visually removes a row a form row from the add/edit formset, and sets the value of the hidden DELETE field for that form
     // to true, to ensure that any data associated with that form row is deleted.
@@ -169,6 +189,15 @@ $(document).ready(function() {
         }
     });
 
+    /** End code related to both adding and editing pledges **/
+    /*********************************************************/
+
+
+    /********************************************/
+    /** Related to displaying existing pledges **/
+
+    const weekMap = JSON.parse($('#week-map').text());  // Array of arrays, pairing dates with week names
+    const checkmark = $('#hidden-check').clone().removeAttr('id', 'aria-hidden').removeClass('hidden');
 
     // Replace the date_collected field of each pledge with the week corresponding to date_collected
     $('p[data-field="date_collected"]').each(function(_, el) {
@@ -181,4 +210,6 @@ $(document).ready(function() {
         $(el).html(innerHtml);
     });
 
+    /** End code related to displaying existing pledges **/
+    /*****************************************************/
 });

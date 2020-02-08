@@ -183,9 +183,9 @@ class DataInput(SunriseLoginRequiredMixin, TemplateView):
         qs = page_obj.object_list
 
         context.update({
-	    'page_obj': page_obj,
-	    'ellipsis_start': page_obj.number > 3,
-	    'ellipsis_end': page_obj.number < paginator.num_pages - 2,
+            'page_obj': page_obj,
+            'ellipsis_start': page_obj.number > 3,
+            'ellipsis_end': page_obj.number < paginator.num_pages - 2,
             'table': {
                 'data': qs.values(*fields),
                 'hidden_data': qs.values(*hidden_fields),
