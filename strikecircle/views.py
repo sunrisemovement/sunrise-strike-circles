@@ -14,7 +14,7 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
-from strikecircle.forms import CreatePledgeFormSet, SignupForm, StrikeCircleCreateForm, StrikeCircleEditForm
+from strikecircle.forms import CreatePledgeFormSet, PledgeFormSet, SignupForm, StrikeCircleCreateForm, StrikeCircleEditForm
 from strikecircle.models import Pledge, StrikeCircle
 
 
@@ -150,24 +150,27 @@ class DataInput(SunriseLoginRequiredMixin, TemplateView):
     context_object_name = 'pledges'
 
     def post(self, request, *args, **kwargs):
-        formset = CreatePledgeFormSet(request.POST)
-        sc = StrikeCircle.objects.get(user__id=request.user.id)
+        formset_type = request.POST['form_type']
+        FormSetClass = PledgeFormSet if formset_type == 'edit' else CreatePledgeFormSet
+        formset = FormSetClass(request.POST)
+
         if formset.is_valid():
-            for form in formset:
-                if form.cleaned_data != {}:
-                    pledge = form.save(commit=False)
-                    pledge.strike_circle = sc
-                    pledge.save()
+            if formset_type == 'edit':
+                formset.save()
+            else:
+                sc = StrikeCircle.objects.get(user__id=request.user.id)
+                for form in formset:
+                    if form.cleaned_data != {}:
+                        pledge = form.save(commit=False)
+                        pledge.strike_circle = sc
+                        pledge.save()
 
-            context = self.get_context_data(**kwargs)
-        else:
-            context = self.get_context_data(formset=formset, **kwargs)
-
+        context = self.get_context_data(**kwargs)
         return render(request, self.template_name, context=context)
 
     def get_queryset(self):
         sc = StrikeCircle.objects.get(user__id=self.request.user.id)
-        return Pledge.objects.filter(strike_circle=sc)
+        return Pledge.objects.filter(strike_circle=sc).order_by('-date_created')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -190,7 +193,8 @@ class DataInput(SunriseLoginRequiredMixin, TemplateView):
                 'fields': fields,
                 'col_classes': ['is-1', 'is-1', 'is-3', 'is-1', 'is-1', 'is-1', 'is-2', 'is-2']
             },
-            'formset': kwargs.get('formset', CreatePledgeFormSet(queryset=Pledge.objects.none())),
+            'add_pledges_formset': kwargs.get('add_pledges_formset', CreatePledgeFormSet(queryset=Pledge.objects.none())),
+            'edit_pledges_formset': kwargs.get('edit_pledges_formset', PledgeFormSet(queryset=qs)),
             'misc_data': {
                 'week_map': Pledge.DATA_COLLECTED_DATES
             }

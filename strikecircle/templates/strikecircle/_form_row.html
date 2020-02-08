@@ -1,0 +1,40 @@
+{% load bulma_tags sc_tags %}
+
+<div data-form-num="{{ form_num }}"
+    id="{{ id }}"
+    class="input-table-row table-row columns {{ classes }}">
+
+    {% for field in form.visible_fields %}
+        {# Don't render the DELETE field inside a wrapper div (causes styling issues) #}
+        {% if field.name != "DELETE" %}
+            <div class="column input-column {{ col_classes|index:forloop.counter0 }}"
+                data-field="{{ field.name }}">
+                    {% if field|is_select %}
+                        <div class="select-wrapper">{{ field }}</div>
+                    {% elif field.name == "one_on_one" %}
+                        <div class="bool-date-wrapper">
+                            {{ field|addclass:"hidden" }}
+                            <input type="checkbox" {% if field.value %} checked {% endif %}>
+                            <span class="checkmark fas fa-check">
+                        </div>
+                    {% elif field.name == "DELETE" %}
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+            </div>
+        {% else %}
+            <!-- formset's DELETE field for form -->
+            {% with "form-"|addstr:form_num|addstr:"-DELETE" as delete_field_name %}
+                <input type="hidden" name="{{ delete_field_name }}">
+            {% endwith %}
+        {% endif %}
+    {% endfor %}
+
+    {% if hidden_fields %}
+        {% for field in form.hidden_fields %}
+            {{ field }}
+        {% endfor %}
+    {% endif %}
+
+    <i class="fas fa-times del-row"></i>
+</div>
