@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'sass_processor',
     'bulma',
+    'background_task',
     'import_export',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -152,13 +153,24 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(LOGGING_ROOT, 'strikecircle.log')
-        }
+        },
+        'background_task_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGGING_ROOT, 'background_task.log')
+        },
+
     },
     'loggers': {
         'django': {
             'handlers': ['console', 'django_file'],
             'level': 'INFO',
             'propagate': True
+        },
+        'background_task': {
+            'handlers': ['console', 'background_task_file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'strikecircle': {
             'handlers': ['console', 'strikecircle_file'],
