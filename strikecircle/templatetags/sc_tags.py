@@ -10,4 +10,7 @@ def index(value, arg):
         val = None
 
     return val
-  
+
+@register.filter
+def addstr(value, arg):
+    return f'{value}{arg}'

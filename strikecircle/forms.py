@@ -71,10 +71,21 @@ class StrikeCircleEditForm(forms.ModelForm):
             'one_on_one_goal': "One-on-one goal (can't be edited once set)"
         }
 
-
-class CreatePledge(forms.ModelForm):
+class PledgeForm(forms.ModelForm):
     class Meta:
         model = Pledge
         fields = ['first_name', 'last_name', 'email', 'phone', 'zipcode', 'yob', 'date_collected', 'one_on_one']
 
-CreatePledgeFormSet = forms.modelformset_factory(Pledge, extra=0, form=CreatePledge)
+class CreatePledgeForm(forms.ModelForm):
+    Meta = PledgeForm.Meta
+
+    def has_changed(self):
+        changed = super().has_changed()
+        # Don't report the form as changed if only the date_collected field is changed, because that field is
+        # autofilled from a cookie every time a new form row is rendered
+        if self.changed_data == ['date_collected']:
+            changed = False
+        return changed
+
+PledgeFormSet = forms.modelformset_factory(Pledge, extra=0, form=PledgeForm, can_delete=True)
+CreatePledgeFormSet = forms.modelformset_factory(Pledge, extra=0, form=CreatePledgeForm, can_delete=True)

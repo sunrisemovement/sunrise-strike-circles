@@ -1,9 +1,11 @@
 @import "./base_template.sass"
 
 .data-input
-    .input-table-added-row
-        display: none
+
+    .input-table-row
         background-color: $grey
+        border: 1px solid black
+        border-width: 0 1px 1px 1px
 
         &:hover
             color: $dark
@@ -11,7 +13,7 @@
         i
             position: absolute;
             right: -2rem
-            margin-top: .5rem
+            margin-top: 1rem
             font-size: 18px
             color: red
             cursor: pointer
@@ -19,13 +21,14 @@
         .input-column
             text-align: center
 
+            $input-border-radius: 3px
+
             input, .select-wrapper, .bool-date-wrapper
                 position: relative
 
             input, .select-wrapper
                 width: 100%
                 height: 100%
-                bottom: .5rem
 
             input, select
                 appearance: none
@@ -35,7 +38,7 @@
                 height: 100%
                 border: 1px solid $dark
                 background-color: $light
-                border-radius: 3px
+                border-radius: $input-border-radius
 
             .select-wrapper::after
                 $arrow-side-len: 6px
@@ -53,8 +56,7 @@
             input[type="checkbox"], input[type="checkbox"] + .checkmark
                 width: 1rem
                 height: 1rem
-                bottom: .25rem
-                margin: 0 auto
+                top: 0.2rem
 
                 + .checkmark
                     display: none
@@ -62,18 +64,36 @@
                 &:checked
                     background-color: transparent
                     z-index: 1
+
                     + .checkmark
                         display: inline
                         position: absolute
-                        top: -1px
+                        top: 0.33rem
                         left: calc(50% - .5rem)
+                        border-radius: $input-border-radius
                         background-color: $light
                         color: $dark
+
+    #add-pledges-form
+        &::not(.hidden)
+            padding-bottom: 1.25rem
+
+        div.input-table-row
+            &:first-of-type
+                border-width: 1px 1px 1px 1px
+
+            &:last-of-type
+                margin-bottom: 0.75rem
+                border-width: 0 1px 2px 1px
+
+                &:first-of-type
+                    border-width: 1px 1px 2px 1px
+
 
     .mode-default
         display: block
 
-    .mode-add
+    .mode-add, .mode-edit
         display: none
 
     .instructions
