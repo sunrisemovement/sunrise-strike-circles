@@ -76,3 +76,8 @@ location /collected_statics/ {
 ...
 ```
 * When you're done with all that, you should be able to make changes to the production server by pushing from your local `master` like so: `git push deploy`. You're all set!
+
+
+### HTTPS via LetsEncrypt
+
+I set up HTTPS on the production DO server using LetsEncrypt. Since the server runs on Ubuntu 18.04 and nginx, I used [these instructions](https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx) from LetsEncrypt. The server has been configured to redirect all HTTP traffic to HTTPS (port 80 -> port 443).
