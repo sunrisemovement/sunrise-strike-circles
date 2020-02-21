@@ -16,6 +16,8 @@ from django.views.generic.list import ListView
 
 from strikecircle.forms import CreatePledgeFormSet, PledgeFormSet, SignupForm, StrikeCircleCreateForm, StrikeCircleEditForm
 from strikecircle.models import Pledge, StrikeCircle
+from strikecircle.tasks import export_to_airtable
+from strikecircle.utils import get_model_type
 
 
 class Signup(CreateView):
@@ -34,6 +36,8 @@ class Signup(CreateView):
             sc = sc_form.save(commit=False)
             sc.user = user
             sc.save()
+            model_type = get_model_type(sc)
+            export_to_airtable(model_type, sc.id, verbose_name="export strike circle {0}".format(str(sc.id)))
 
             authenticated_user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
             if authenticated_user is not None:
@@ -164,6 +168,8 @@ class DataInput(SunriseLoginRequiredMixin, TemplateView):
                         pledge = form.save(commit=False)
                         pledge.strike_circle = sc
                         pledge.save()
+                        model_type = get_model_type(pledge)
+                    	export_to_airtable(model_type, pledge.id, verbose_name="export pledge {0}".format(str(pledge.id)))
 
         context = self.get_context_data(**kwargs)
         return render(request, self.template_name, context=context)
