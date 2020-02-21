@@ -51,14 +51,22 @@ Many of these instructions overlap with the local deploy process.
 * Log into [Digital Ocean](https://digitalocean.com). (If you're using the sunrise DO account, ask Andrew Jones for credentials.)
 * Create a new Ubuntu 18.04 droplet. The smallest/cheapest option should be fine (1GB RAM, 25GB storage). When you're creating it, there should be an option to add an SSH key -- add yours. This will allow you to SSH into the droplet once it has been created.
 * Once you have a droplet, follow the steps in Digital Ocean's [initial server setup guide](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04).
-* Install system-level dependencies: `sudo apt install curl python3 python3-dev python3-pip python3.7-dev nginx nodejs npm`
+* Install system-level dependencies: `sudo apt install curl python3 python3-dev python3-pip python3.7-dev nginx nodejs npm supervisor`
 * Install Pipenv: `pip3 install --user pipenv`
 * Add Pipenv to the path, by adding this line to `~/.bashrc` (or `~/.zshrc`, if you use `zsh`): `export PATH="$HOME/.local/bin/:$PATH"`
 * Do a bare clone this repository and change directory into it: `git clone --bare https://github.com/sunrisemovement/sunrise-strike-circles && cd sunrise-strike-circles.git/`
 * Copy `.env.example` to `.env`, and fill in the variables in it. You can generate a secret key with [Djecrety](https://djecrety.ir/), and `SITE_URLS` should be set to a comma-separated list of all domains you might be accessing the project from. When I set it up, the list was `localhost,strikecircle.sunrisemovement.org,<droplet ipv4 address>,<droplet ipv6 address>`, but yours may be different.
-* In the bare repository you cloned to, create the file `hooks/post-receive` and add the contents of `.githooks/post-receive` to it. You'll have to copy `.githooks/post-receive` from a regular repository, not a bare one -- your local repo will work just fine. Once you've created `hooks/post-receive`, make it executable with `chmod +x hooks/post-receive`.
+* In the bare repository you cloned to, create the file `hooks/post-receive` and add the contents of `scripts/post-receive` to it. You'll have to copy `scripts/post-receive` from a regular repository, not a bare one -- your local repo will work just fine. Once you've created `hooks/post-receive`, make it executable with `chmod +x hooks/post-receive`.
 * In your local repository, add your bare repository as a remote (in this case, I'm naming the remote `deploy`): `git remote add deploy ubuntu@<server-ip>:~/sunrise-strike-circles.git`
 * Create a Django superuser with `./manage.py createsuperuser` (then follow the prompts)
+* Edit `/etc/supervisord.conf` and add this to the bottom of the file:
+```
+[program:sc_push_airtable]
+command=/home/ubuntu/sunrise-strike-circles/scripts/airtable-supervisor
+autostart=true
+autorestart=true
+```
+This ensures that any new StrikeCircles/Pledges are pushed to Airtable.
 * Then, follow Digital Ocean's [guide for deploying a Django app](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04) using Gunicorn, starting where they tell you to "create an exception for port 8000". They use a lot of placeholder names -- don't forget to replace them all with their actual values in this app! For instance, replace `myproject` with `sunrise`, `sammy` with the name of the user you created in the initial setup guide, etc.
 * Open up the nginx site configuration that you created in the last step (probably a file like `/etc/nginx/sites-available/sunrise-strike-circles`, or something like that). Add the following, inside the `server` block:
 ```
