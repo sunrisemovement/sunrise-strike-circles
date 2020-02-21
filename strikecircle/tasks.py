@@ -28,9 +28,9 @@ def export_to_airtable(data_type, obj_id):
             serialized_record = serialize("json", [strike_circle])
             record = json.loads(serialized_record)[0]
             if record["model"] == "strikecircle.strikecircle":
-                    table_name = "Strike Circle"
-                    airtable = Airtable(BASE_KEY, table_name, api_key=API_KEY)
-                    return airtable.insert(record["fields"])
+                table_name = "Strike Circle"
+                airtable = Airtable(BASE_KEY, table_name, api_key=API_KEY)
+                return airtable.insert(record["fields"])
 
         elif data_type == 'pledge':
             pledge = Pledge.objects.get(pk=obj_id)

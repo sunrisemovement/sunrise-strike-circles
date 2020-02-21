@@ -169,7 +169,7 @@ class DataInput(SunriseLoginRequiredMixin, TemplateView):
                         pledge.strike_circle = sc
                         pledge.save()
                         model_type = get_model_type(pledge)
-                    	export_to_airtable(model_type, pledge.id, verbose_name="export pledge {0}".format(str(pledge.id)))
+                        export_to_airtable(model_type, pledge.id, verbose_name="export pledge {0}".format(str(pledge.id)))
 
         context = self.get_context_data(**kwargs)
         return render(request, self.template_name, context=context)
