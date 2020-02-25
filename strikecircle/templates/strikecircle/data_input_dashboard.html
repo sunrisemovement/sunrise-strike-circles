@@ -92,7 +92,11 @@
         >
             {% for key, val in row.items %}
                 <div class="column {{ table.col_classes|index:forloop.counter0 }}">
-                    <p data-field="{{ key }}" data-value="{{ val }}" class="is-8">{{ val }}</p>
+                    <p data-field="{{ key }}" data-value="{{ val }}" class="is-8">
+                        {% if val != None %}
+                            {{ val }}
+                        {% endif %}
+                    </p>
                 </div>
             {% endfor %}
         </div>
