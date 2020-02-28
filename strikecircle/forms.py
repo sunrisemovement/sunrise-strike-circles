@@ -88,4 +88,3 @@ class CreatePledgeForm(forms.ModelForm):
         return changed
 
 PledgeFormSet = forms.modelformset_factory(Pledge, extra=0, form=PledgeForm, can_delete=True)
-CreatePledgeFormSet = forms.modelformset_factory(Pledge, extra=0, form=CreatePledgeForm, can_delete=True)
