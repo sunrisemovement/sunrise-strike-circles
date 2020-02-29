@@ -1,0 +1,13 @@
+{% load sc_tags %}
+
+<div class="table-row read-only-row columns">
+    {% for key, val in row.items %}
+        <div class="column {{ col_classes|index:forloop.counter0 }}">
+            <p data-field="{{ key }}" data-value="{{ val }}" class="is-8">
+                {% if val != None %}
+                    {{ val }}
+                {% endif %}
+            </p>
+        </div>
+    {% endfor %}
+</div>

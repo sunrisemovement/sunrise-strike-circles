@@ -7,14 +7,15 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Sum
-from django.http import HttpResponseRedirect
+from django.forms.models import model_to_dict
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
-from strikecircle.forms import CreatePledgeFormSet, PledgeFormSet, SignupForm, StrikeCircleCreateForm, StrikeCircleEditForm
+from strikecircle.forms import CreatePledgeForm, PledgeFormSet, SignupForm, StrikeCircleCreateForm, StrikeCircleEditForm
 from strikecircle.models import Pledge, StrikeCircle
 from strikecircle.tasks import export_to_airtable
 from strikecircle.utils import get_model_type
@@ -154,25 +155,42 @@ class DataInput(SunriseLoginRequiredMixin, TemplateView):
     context_object_name = 'pledges'
 
     def post(self, request, *args, **kwargs):
-        formset_type = request.POST['form_type']
-        FormSetClass = PledgeFormSet if formset_type == 'edit' else CreatePledgeFormSet
-        formset = FormSetClass(request.POST)
+        submit_type = request.POST['submit_type']
+        context = self.get_context_data(**kwargs)
 
-        if formset.is_valid():
-            if formset_type == 'edit':
+        if submit_type == 'edit':
+            formset = PledgeFormSet(request.POST)
+            if formset.is_valid():
                 formset.save()
             else:
-                sc = StrikeCircle.objects.get(user__id=request.user.id)
-                for form in formset:
-                    if form.cleaned_data != {}:
-                        pledge = form.save(commit=False)
-                        pledge.strike_circle = sc
-                        pledge.save()
-                        model_type = get_model_type(pledge)
-                        export_to_airtable(model_type, pledge.id, verbose_name="export pledge {0}".format(str(pledge.id)))
-
-        context = self.get_context_data(**kwargs)
-        return render(request, self.template_name, context=context)
+                context['edit_pledges_formset'] = formset
+            return render(request, self.template_name, context=context)
+        elif submit_type == 'add':
+            form = CreatePledgeForm(request.POST)
+            sc = StrikeCircle.objects.get(user__id=request.user.id)
+            if form.is_valid() and form.cleaned_data != {}:
+                pledge = form.save(commit=False)
+                pledge.strike_circle = sc
+                pledge.save()
+                model_type = get_model_type(pledge)
+                export_to_airtable(model_type, pledge.id, verbose_name="export pledge {0}".format(str(pledge.id)))
+                return JsonResponse({
+                    'status': 'success',
+                    'data': {
+                        'first_name': pledge.first_name,
+                        'last_name': pledge.last_name,
+                        'email': pledge.email,
+                        'phone': str(pledge.phone),
+                        'zipcode': pledge.zipcode,
+                        'yob': pledge.yob,
+                        'date_collected': pledge.date_collected,
+                        'one_on_one': pledge.one_on_one,
+                    }
+                })
+            elif not form.has_changed():
+                return JsonResponse({'status': 'unchanged'})
+            else:
+                return JsonResponse({'status': 'error', 'form_errors': form.errors})
 
     def get_queryset(self):
         sc = StrikeCircle.objects.get(user__id=self.request.user.id)
@@ -182,7 +200,6 @@ class DataInput(SunriseLoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         fields = ['first_name', 'last_name', 'email', 'phone', 'zipcode', 'yob', 'date_collected', 'one_on_one']
-        hidden_fields = ['id']
         paginator = Paginator(self.get_queryset(), 20)
         page_num = self.request.GET.get('page')
         page_obj = paginator.get_page(page_num)
@@ -194,12 +211,12 @@ class DataInput(SunriseLoginRequiredMixin, TemplateView):
             'ellipsis_end': page_obj.number < paginator.num_pages - 2,
             'table': {
                 'data': qs.values(*fields),
-                'hidden_data': qs.values(*hidden_fields),
+                'empty_row': {key: '__prefix__' for key in fields},
                 'header_row': ['First name', 'Last name', 'Email address', 'Phone #', 'Zipcode', 'YOB', 'Week pledged', 'One-on-one completed?'],
                 'fields': fields,
                 'col_classes': ['is-1', 'is-1', 'is-3', 'is-1', 'is-1', 'is-1', 'is-2', 'is-2']
             },
-            'add_pledges_formset': kwargs.get('add_pledges_formset', CreatePledgeFormSet(queryset=Pledge.objects.none())),
+            'add_pledges_form': kwargs.get('add_pledges_form', CreatePledgeForm()),
             'edit_pledges_formset': kwargs.get('edit_pledges_formset', PledgeFormSet(queryset=qs)),
             'misc_data': {
                 'week_map': Pledge.DATA_COLLECTED_DATES

@@ -48,8 +48,44 @@ $(document).ready(function() {
     /**************************/
 
 
+    /********************************************/
+    /** Related to displaying existing pledges **/
+
+    const weekMap = JSON.parse($('#week-map').text());  // Array of arrays, pairing dates with week names
+    const checkmark = $('#hidden-check').clone().removeAttr('id', 'aria-hidden').removeClass('hidden');
+
+    const updateDateCollected = el => {
+        $(el).text(dateToWeek($(el).data('value')));
+    };
+
+    const oneOnOneToCheckmark = el => {
+        const innerHtml = $(el).data('value') != 'None' ? $(checkmark).clone() : '';
+        $(el).html(innerHtml);
+    };
+
+    // Replace the date_collected field of each pledge with the week corresponding to date_collected
+    $('p[data-field="date_collected"]').each((_, el) => updateDateCollected(el));
+
+    // Replace one-on-one dates with checkmarks
+    $('p[data-field="one_on_one"]').each((_, el) => oneOnOneToCheckmark(el));
+
+    /** End code related to displaying existing pledges **/
+    /*****************************************************/
+
+
     /*******************************/
     /** Related to adding pledges **/
+
+    const csrfToken = getCookie('csrftoken');
+    // These HTTP methods do not require CSRF protection
+    const csrfSafeMethod = method => /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            }
+        }
+    });
 
     // Toggles between add mode and view mode
     const addModeToggle = turnOn => {
@@ -58,7 +94,7 @@ $(document).ready(function() {
             // If add mode was toggled on and there aren't any empty form rows, add one and refresh
             // the rowsToToggle selector
             if (turnOn && $rowsToToggle.length == 0) {
-                addForm();
+                addInputFormRow();
                 $rowsToToggle = $($rowsToToggle.selector);
             }
 
@@ -72,8 +108,60 @@ $(document).ready(function() {
         }
     };
 
+    // POST data from current form row, displaying form errors if they exist
+    const submitPledge = cb => {
+        const form = document.getElementById(_addPledgesForm.substring(1));
+
+        // If there isn't any data to submit, just call the callback
+        if ($(form).find(_inputTableRow).not(`.${_hiddenClass}`).length == 0) {
+            cb();
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        $.ajax({
+            type: 'POST',
+            url: '/strike-circle/data-entry/',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: (data, status, jqXHR) => {
+                if (data.status == 'success') {
+                    $(form).find(_inputTableRow).remove();
+                    cb(data);
+                } else if (data.status == 'unchanged') {
+                    cb();
+                } else if (data.status == 'error') {
+                    for (let key of Object.keys(data.form_errors)) {
+                        $(_addPledgesForm).find(`input[name=${key}]`).addClass('invalid')
+                    }
+                }
+            },
+            error: (jqXHR, status, error) => {
+                console.log(error, status);
+            }
+        });
+    };
+
+    // Add newly added Pledge to the display table
+    const addDataRow = rowData => {
+        if (rowData) {
+            $clone = $('#display-row-template .table-row').clone();
+            $clone.find('.column p').each(function(_, el) {
+                const fieldName = $(this).data('field');
+                const fieldVal = rowData[fieldName]
+                $(this).data('value', fieldVal);
+                $(this).text(fieldVal);
+            });
+            updateDateCollected($clone.find('p[data-field="date_collected"]'));
+            oneOnOneToCheckmark($clone.find('p[data-field="one_on_one"]'));
+            $('.data-input > .table-row.read-only-row').not(`.${_hiddenClass}`).first().before($clone);
+        }
+    };
+
     // Add another form to the formset
-    const addForm = () => {
+    const addInputFormRow = () => {
         const $totalFormsSel = $(_addPledgesForm).find('#id_form-TOTAL_FORMS');
         const numForms = parseInt($totalFormsSel.val());
         $totalFormsSel.val(numForms + 1);
@@ -87,7 +175,7 @@ $(document).ready(function() {
                     const newValue = this.value.replace(_formAttrPlaceholder, numForms);
                     $el.attr(this.name, newValue);
                 }
-            })
+            });
         });
         $clone.css('display', 'flex');
         $(_addPledgesForm).append($clone);
@@ -106,11 +194,18 @@ $(document).ready(function() {
 
     // Button actions for adding new pledges
     $('#add-pledges-button').click(addModeToggle(true));
-    $('#cancel-adding-button').click(addModeToggle(false));
     $('#submit-pledges-button').click(() => {
-        $('#add-pledges-form').submit();
+        submitPledge(_ => {
+            location.reload();
+            return false;
+        })
     });
-    $('#add-another-button').click(addForm);
+    $('#add-another-button').click(() => {
+        submitPledge(data => {
+            addDataRow(data.data);
+            addInputFormRow();
+        });
+    });
 
     /** End code related to adding new pledges **/
     /********************************************/
@@ -191,25 +286,4 @@ $(document).ready(function() {
 
     /** End code related to both adding and editing pledges **/
     /*********************************************************/
-
-
-    /********************************************/
-    /** Related to displaying existing pledges **/
-
-    const weekMap = JSON.parse($('#week-map').text());  // Array of arrays, pairing dates with week names
-    const checkmark = $('#hidden-check').clone().removeAttr('id', 'aria-hidden').removeClass('hidden');
-
-    // Replace the date_collected field of each pledge with the week corresponding to date_collected
-    $('p[data-field="date_collected"]').each(function(_, el) {
-        $(el).text(dateToWeek($(el).data('value')));
-    });
-
-    // Replace one-on-one dates with checkmarks
-    $('p[data-field="one_on_one"]').each(function(_, el) {
-        const innerHtml = $(el).data('value') != 'None' ? $(checkmark).clone() : '';
-        $(el).html(innerHtml);
-    });
-
-    /** End code related to displaying existing pledges **/
-    /*****************************************************/
 });

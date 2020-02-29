@@ -21,15 +21,14 @@
 
         <div class="level-left mode-add">
             <p class="instructions">Fill in the new line to add a new pledge.</p>
-            <p class="instructions">Click "Add another" when you're done to add another pledge.</p>
-            <p class="instructions">When you're done entering pledges, click "Submit Pledges" to save your work!</p>
+            <p class="instructions">Click "Add another" when you're done to save your new pledge and add another.</p>
+            <p class="instructions">When you're done entering pledges, click "Done Adding"!</p>
         </div>
         <div class="level-right mode-add">
             <span class="sunrise-button" id="add-another-button">Add another</span>
-            <span class="sunrise-button" id="cancel-adding-button">Cancel Adding</span>
         </div>
         <div class="level-right mode-add">
-            <div class="sunrise-button primary" id="submit-pledges-button">Submit Pledges</div>
+            <div class="sunrise-button primary" id="submit-pledges-button">Done Adding</div>
         </div>
 
         <div class="level-left mode-edit">
@@ -59,12 +58,12 @@
         fields, because the hidden_fields contains a hidden ID input, which is only needed if you're editing
         existing objects. Since we're only creating new items here, we'd cause an error by submitting the formset
         with hidden, empty ID fields. -->
-        {% include 'strikecircle/_form_row.html' with form=add_pledges_formset.empty_form classes="template hidden" id="empty-clone" col_classes=table.col_classes form_num="__prefix__" %}
+        {% include 'strikecircle/_form_row.html' with form=add_pledges_form classes="template hidden" id="empty-clone" col_classes=table.col_classes %}
+
 
         <form id="add-pledges-form" method="post">
-            {{ add_pledges_formset.management_form }}
             {% csrf_token %}
-            <input type="hidden" name="form_type" value="add">
+            <input type="hidden" name="submit_type" value="add">
         </form>
     </div>
 
@@ -74,32 +73,18 @@
         {% endfor %}
         {{ edit_pledges_formset.management_form }}
         {% csrf_token %}
-        <input type="hidden" name="form_type" value="edit">
+        <input type="hidden" name="submit_type" value="edit">
     </div>
 
     <form id="edit-pledges-form" class="hidden" method="post"></form>
     <span id="hidden-check" class="hidden fas fa-check"></span>
 
+    <div class="hidden" id="display-row-template">
+        {% include 'strikecircle/_display_row.html' with row=table.empty_row col_classes=table.col_classes %}
+    </div>
+
     {% for row in table.data %}
-        <div class="table-row read-only-row columns"
-            {% if table.hidden_data %}
-                {% with table.hidden_data|index:forloop.counter0 as hidden_row_data %}
-                    {% for key, val in hidden_row_data.items %}
-                        data-{{ key }}="{{ val }}"
-                    {% endfor %}
-                {% endwith %}
-            {% endif %}
-        >
-            {% for key, val in row.items %}
-                <div class="column {{ table.col_classes|index:forloop.counter0 }}">
-                    <p data-field="{{ key }}" data-value="{{ val }}" class="is-8">
-                        {% if val != None %}
-                            {{ val }}
-                        {% endif %}
-                    </p>
-                </div>
-            {% endfor %}
-        </div>
+        {% include 'strikecircle/_display_row.html' with row=row col_classes=table.col_classes %}
     {% endfor %}
 
 	{% if page_obj.paginator.num_pages > 1 %}
