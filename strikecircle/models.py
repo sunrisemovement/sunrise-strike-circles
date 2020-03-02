@@ -57,7 +57,7 @@ class Pledge(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.CharField(max_length=100, validators=[EmailValidator], unique=True)
-    phone = PhoneNumberField(blank=True, null=True)
+    phone = PhoneNumberField()
     zipcode = USZipCodeField(max_length=5)
     yob = models.IntegerField(choices=YEAR_CHOICES, blank=True, null=True)
     one_on_one = models.DateField(blank=True, null=True)
